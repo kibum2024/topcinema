@@ -1,0 +1,29 @@
+# Windows 관련 불필요 파일
+Thumbs.db
+
+# Frontend ignores
+/frontend/node_modules/    # 프론트엔드의 node_modules 디렉토리 제외 (외부 패키지들)
+/frontend/build/           # 프론트엔드의 빌드 결과물 제외 (react 등의 빌드 결과)
+/frontend/dist/            # 프론트엔드의 배포 디렉토리 제외
+/frontend/.env             # 프론트엔드 환경설정 파일(민감한 정보)
+
+/frontend/npm-debug.log    # npm 설치 시 발생할 수 있는 디버그 로그 제외
+/frontend/debug.log    # yarn 관련 로그
+/frontend/yarn-error.log   # yarn 관련 에러 로그
+
+# Backend ignores
+/backend/target/           # 백엔드의 빌드 결과물 제외 (Maven, Gradle 빌드 결과)
+/backend/.env              # 백엔드 환경설정 파일(민감한 정보)
+/backend/logs/             # 백엔드 로그 파일들 제외
+/backend/tmp/              # 임시 파일 제외
+/backend/*.log             # 모든 로그 파일 제외
+/backend/*.bak             # 백업 파일 제외
+/backend/src/main/resources/application.properties
+
+# IDE 및 편집기 관련 설정
+.idea/                    # IntelliJ IDEA 프로젝트 파일
+.vscode/                  # VSCode 프로젝트 파일
+*.iml                     # IntelliJ IDEA 프로젝트 파일
+*.iws
+*.ipr
+out/
