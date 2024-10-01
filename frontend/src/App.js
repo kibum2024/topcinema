@@ -5,8 +5,8 @@ import ImageUpload from './ImageUpload';
 function App() {
   return (
     <div className="App">
-      <ImageUpload />
-      {/* <MovieList /> */}
+      {/* <ImageUpload /> */}
+      <MovieList />
     </div>
   );
 }

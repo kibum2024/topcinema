@@ -1,46 +1,59 @@
 package com.topcinema.backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "movies")
 public class Movie {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "movie_code")
+    private int movie_code;
 
-    private String title;
+    @Column(name = "movie_name", length = 100)
+    private String movie_name;  // JSON과 DB에서 모두 movie_name 사용
 
-    private String imagePath;
+    @Column(name = "screening_time", length = 4)
+    private String screening_time;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
+    @Column(name = "age_restriction", length = 20)
+    private String age_restriction;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @Column(name = "view_count")
+    private Integer view_count;
 
-    public String getTitle() {
-        return title;
-    }
+    @Column(name = "screening_start_date", length = 8)
+    private String screening_start_date;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    @Column(name = "screening_end_date", length = 8)
+    private String screening_end_date;
 
-    public String getImagePath() {
-        return imagePath;
-    }
+    @Column(name = "movie_story", length = 2000)
+    private String movie_story;
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
-    }
+    @Column(name = "movie_genre", length = 100)
+    private String movie_genre;
+
+    @Column(name = "nationality", length = 100)
+    private String nationality;
+
+    @Column(name = "director", length = 100)
+    private String director;
+
+    @Column(name = "movie_image_name", length = 200)
+    private String movie_image_name;
+
+    @Column(name = "registration_date", length = 8)
+    private String registration_date;
+
+    @Column(name = "user_code")
+    private Integer user_code;
+
+    @Column(name = "image_path", length = 255)
+    private String image_path;
 }
-

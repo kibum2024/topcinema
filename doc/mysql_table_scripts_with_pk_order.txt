@@ -1,0 +1,342 @@
+-- user_memberships 테이블 생성 스크립트
+CREATE TABLE user_memberships (
+    user_code int,
+    user_email varchar(100),
+    user_name varchar(100),
+    user_phone varchar(20),
+    user_type char(1),
+    is_active char(1),
+    user_password varchar(30),
+    membership_type char(1),
+    registration_date char(8),
+    membership_grade char(1),
+    birth_date char(8),
+    PRIMARY KEY (user_code)
+);
+
+-- user_permissions 테이블 생성 스크립트
+CREATE TABLE user_permissions (
+    user_code int,
+    menu_code int,
+    insert_permission char(1),
+    update_permission char(1),
+    delete_permission char(1),
+    select_permission char(1),
+    PRIMARY KEY (user_code, menu_code)
+);
+
+-- user_favorite_cinemas 테이블 생성 스크립트
+CREATE TABLE user_favorite_cinemas (
+    user_code int,
+    movie_code int,
+    registration_date char(8),
+    PRIMARY KEY (user_code, movie_code)
+);
+
+-- user_payment_historys 테이블 생성 스크립트
+CREATE TABLE user_payment_historys (
+    user_code int,
+    payment_code int,
+    PRIMARY KEY (user_code, payment_code)
+);
+
+-- user_coupon_boxs 테이블 생성 스크립트
+CREATE TABLE user_coupon_boxs (
+    user_code int,
+    coupon_code int,
+    is_active char(1),
+    PRIMARY KEY (user_code, coupon_code)
+);
+
+-- user_movie_logs 테이블 생성 스크립트
+CREATE TABLE user_movie_logs (
+    user_code int,
+    movie_type char(1),
+    movie_code int,
+    PRIMARY KEY (user_code, movie_type, movie_code)
+);
+
+-- regions 테이블 생성 스크립트
+CREATE TABLE regions (
+    region_code int,
+    region_name varchar(100),
+    region_type char(2),
+    PRIMARY KEY (region_code)
+);
+
+-- movies 테이블 생성 스크립트
+CREATE TABLE movies (
+    movie_code int,
+    movie_name varchar(100),
+    screening_time char(4),
+    age_restriction char(3),
+    screening_type char(1),
+    view_count int,
+    screening_start_date char(8),
+    screening_end_date char(8),
+    interest_count int,
+    movie_story varchar(2000),
+    movie_genre varchar(100),
+    nationality varchar(100),
+    director varchar(100),
+    movie_image_name varchar(200),
+    registration_date char(8),
+    user_code int,
+    PRIMARY KEY (movie_code)
+);
+
+-- movie_trailers 테이블 생성 스크립트
+CREATE TABLE movie_trailers (
+    movie_code int,
+    trailer_code int,
+    trailer_name varchar(100),
+    trailer_video_name varchar(100),
+    PRIMARY KEY (movie_code, trailer_code)
+);
+
+-- movie_still_cuts 테이블 생성 스크립트
+CREATE TABLE movie_still_cuts (
+    movie_code int,
+    still_cut_code int,
+    still_cut_image_name varchar(200),
+    PRIMARY KEY (movie_code, still_cut_code)
+);
+
+-- movie_actors 테이블 생성 스크립트
+CREATE TABLE movie_actors (
+    movie_code int,
+    actor_code int,
+    PRIMARY KEY (movie_code, actor_code)
+);
+
+-- actots 테이블 생성 스크립트
+CREATE TABLE actots (
+    actor_code int,
+    actor_name varchar(100),
+    birth_date char(8),
+    nationality varchar(100),
+    PRIMARY KEY (actor_code)
+);
+
+-- movie_by_actors 테이블 생성 스크립트
+CREATE TABLE movie_by_actors (
+    actor_code int,
+    movie_code int,
+    PRIMARY KEY (actor_code, movie_code)
+);
+
+-- movie_reviews 테이블 생성 스크립트
+CREATE TABLE movie_reviews (
+    movie_code int,
+    registration_date char(8),
+    user_code int,
+    review varchar(300),
+    sympathy_count int,
+    rating int,
+    PRIMARY KEY (movie_code, registration_date, user_code)
+);
+
+-- movie_screenings 테이블 생성 스크립트
+CREATE TABLE movie_screenings (
+    theater_code int,
+    screen_code int,
+    movie_code int,
+    screening_date char(8),
+    screening_time char(4),
+    reservation_count int,
+    registration_date char(8),
+    user_code int,
+    PRIMARY KEY (theater_code, screen_code, movie_code, screening_date, screening_time)
+);
+
+-- movie_screenings_seat 테이블 생성 스크립트
+CREATE TABLE movie_screenings_seat (
+    theater_code int,
+    screen_code int,
+    movie_code int,
+    screening_date char(8),
+    screening_time char(4),
+    seat_row char(1),
+    seat_col int,
+    seat_type char(1),
+    reserved char(1),
+    PRIMARY KEY (theater_code, screen_code, movie_code, screening_date, screening_time, seat_row, seat_col)
+);
+
+-- cinemas 테이블 생성 스크립트
+CREATE TABLE cinemas (
+    theater_code int,
+    theater_name varchar(100),
+    road_code char(5),
+    address varchar(100),
+    detail_address varchar(100),
+    public_transport_info varchar(2000),
+    parking_info varchar(2000),
+    longitude decimal(2.6),
+    latitude decimal(2.6),
+    region_code int,
+    PRIMARY KEY (theater_code)
+);
+
+-- movie_pricings 테이블 생성 스크립트
+CREATE TABLE movie_pricings (
+    screen_type char(1),
+    screening_type char(1),
+    seat_kind char(1),
+    screening_day char(8),
+    adult_fee int,
+    teenager_fee int,
+    senior_fee int,
+    disabled_fee int,
+    child_fee int,
+    PRIMARY KEY (screen_type, screening_type, seat_kind, screening_day)
+);
+
+-- cinema_auditoriums 테이블 생성 스크립트
+CREATE TABLE cinema_auditoriums (
+    theater_code int,
+    screen_code int,
+    screen_name varchar(100),
+    screen_type char(1),
+    seat_structure_code int,
+    PRIMARY KEY (theater_code, screen_code)
+);
+
+-- cinema_group_viewings 테이블 생성 스크립트
+CREATE TABLE cinema_group_viewings (
+    theater_code int,
+    movie_code int,
+    PRIMARY KEY (theater_code, movie_code)
+);
+
+-- auditorium_seat_structures 테이블 생성 스크립트
+CREATE TABLE auditorium_seat_structures (
+    seat_structure_code int,
+    seat_structure_name varchar(100),
+    seat_count int,
+    seat_row char(1),
+    seat_col int,
+    seat_type char(1),
+    PRIMARY KEY (seat_structure_code)
+);
+
+-- events 테이블 생성 스크립트
+CREATE TABLE events (
+    event_code int,
+    event_name varchar(100),
+    event_type char(1),
+    event_image_name varchar(200),
+    precautions varchar(2000),
+    event_start_date char(8),
+    event_end_date char(8),
+    PRIMARY KEY (event_code)
+);
+
+-- event_specific_entrys 테이블 생성 스크립트
+CREATE TABLE event_specific_entrys (
+    event_code int,
+    user_code int,
+    winner_type char(1),
+    entry_date char(8),
+    entry_content varchar(2000),
+    PRIMARY KEY (event_code, user_code)
+);
+
+-- local_events 테이블 생성 스크립트
+CREATE TABLE local_events (
+    local_event_code int,
+    theater_code int,
+    event_title varchar(100),
+    event_content varchar(2000),
+    precautions varchar(2000),
+    event_start_date char(8),
+    event_end_date char(8),
+    PRIMARY KEY (local_event_code, theater_code)
+);
+
+-- stores 테이블 생성 스크립트
+CREATE TABLE stores (
+    product_code int,
+    product_type char(1),
+    product_name varchar(100),
+    product_description varchar(2000),
+    product_price int,
+    components varchar(100),
+    purchase_limit varchar(100),
+    validity_period varchar(100),
+    applicable_theaters varchar(100),
+    number_of_items int,
+    PRIMARY KEY (product_code)
+);
+
+-- store_guides 테이블 생성 스크립트
+CREATE TABLE store_guides (
+    product_code int,
+    product_title varchar(100),
+    product_description varchar(2000),
+    PRIMARY KEY (product_code)
+);
+
+-- menus 테이블 생성 스크립트
+CREATE TABLE menus (
+    menu_code int,
+    menu_kind char(1),
+    menu_main char(2),
+    menu_sub char(2),
+    menu_small char(2),
+    menu_name varchar(100),
+    menu_type char(1),
+    PRIMARY KEY (menu_code)
+);
+
+-- announcements 테이블 생성 스크립트
+CREATE TABLE announcements (
+    notice_code int,
+    notice_type char(1),
+    registration_date char(8),
+    view_count int,
+    notice_title varchar(100),
+    notice_content varchar(2000),
+    PRIMARY KEY (notice_code)
+);
+
+-- inquirys 테이블 생성 스크립트
+CREATE TABLE inquirys (
+    inquiry_code int,
+    inquiry_category char(1),
+    inquiry_type char(2),
+    inquiry_title varchar(100),
+    inquiry_content varchar(2000),
+    attachment varchar(100),
+    is_answer_received char(1),
+    is_data_consent char(1),
+    user_code int,
+    PRIMARY KEY (inquiry_code)
+);
+
+-- faqs 테이블 생성 스크립트
+CREATE TABLE faqs (
+    faq_code int,
+    faq_category char(1),
+    faq_title varchar(100),
+    faq_content varchar(2000),
+    registration_date char(8),
+    PRIMARY KEY (faq_code)
+);
+
+-- lost_item_inquirys 테이블 생성 스크립트
+CREATE TABLE lost_item_inquirys (
+    lost_item_code int,
+    theater_code int,
+    lost_date char(8),
+    lost_start_time char(4),
+    lost_end_time char(4),
+    lost_type char(1),
+    lost_color char(1),
+    lost_content varchar(2000),
+    is_answer_received char(1),
+    is_data_consent char(1),
+    user_code int,
+    PRIMARY KEY (lost_item_code)
+);
+

@@ -7,8 +7,10 @@ const MovieList = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await axios.get('http://43.203.201.45:8080/api/movies');
+        // const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/movies`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/movies.json`);
         if (response.data) {
+          // console.log("response.data : ", response.data);
           setMovies(response.data);  // 가져온 데이터가 있을 때만 state에 저장
         }
       } catch (error) {
@@ -23,13 +25,14 @@ const MovieList = () => {
     <div>
       <h1>Movie List</h1>
       <div className="movie-list">
+        {/* {console.log("movies : ", movies)} */}
         {movies.map(movie => (
-          <div key={movie.id} className="movie-item">
-            <h2>{movie.title}</h2>
+          <div key={movie.movie_code} className="movie-item">
+            <h2>{movie.movie_name}</h2>
             {/* 이미지 경로를 올바르게 지정 */}
             <img 
-              src={`${process.env.REACT_APP_API_URL}/images/${movie.imagePath}`} 
-              alt={movie.title} 
+              src={`${process.env.REACT_APP_API_URL}/images/${movie.movie_image_name}`} 
+              alt={movie.movie_name} 
               style={{ width: '200px' }} 
             />
           </div>
