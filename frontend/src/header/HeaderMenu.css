@@ -1,0 +1,156 @@
+.header-menu-wrap {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.header-menu-top-wrap {
+  display: flex;
+  justify-content: space-between;
+  width: 980px;
+  height: 71px;
+  align-items: flex-end;
+  margin: 0 auto;
+  padding: 10px 0px;
+  border-bottom: 1px solid #aaa;
+}
+
+.header-menu-top-left-gnb>ul, .header-menu-top-right-gnb>ul {
+  display: flex;
+  gap: 15px;
+}
+
+.header-menu-top-logo-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  line-height: 60px;
+  cursor: pointer;
+}
+
+.header-menu-top-logo-image>img {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.header-menu-top-logo-title {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.header-menu-bottom-wrap {
+  position: relative;
+  width: 980px;
+  margin: 0 auto;
+}
+
+.header-menu-bottom-menu-main {
+  transition: all 0.3s ease;
+}
+
+.header-menu-bottom-menu-main>ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+}
+
+.header-menu-bottom-menu-main-list {
+  position: relative;
+  padding: 0px 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.header-menu-bottom-menu-main-list:not(:first-child)::after {
+  content: '';
+  position: absolute;
+  display: block;
+  left: 0px;
+  top: 40%;
+  margin-top: -2px;
+  height: 10px;
+  width: 1px;
+  background-color: #ddd;
+}
+
+.header-menu-bottom-menu-sub>ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  background-color: #000;
+  color: #F8F8F8;
+}
+
+.header-menu-bottom-menu-sub-list {
+  padding: 0px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.header-menu-bottom-menu-small {
+  height: auto;
+  background-color: #000;
+  color: #F8F8F8;
+}
+
+.header-menu-bottom-menu-small-size>ul {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 980px;
+  margin: 0 auto;
+}
+
+.header-menu-bottom-menu-small-list {
+  padding: 0px 20px;
+  font-size: 12px;
+  font-weight: bold;
+  height: 20px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.header-menu-bottom-right-gnb {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.header-menu-bottom-right-gnb>ul {
+  display: flex;
+  gap: 10px;
+}
+
+.header-menu-bottom-wrap.sticky {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  background-color: white;
+  color: black;
+}
+
+
+.header-menu-bottom-wrap.sticky .header-menu-bottom-menu-sub {
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  box-sizing: border-box;
+  background-color: black;
+  color: white;
+  cursor: pointer;
+}
+

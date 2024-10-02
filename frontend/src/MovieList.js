@@ -31,7 +31,7 @@ const MovieList = () => {
             <h2>{movie.movie_name}</h2>
             {/* 이미지 경로를 올바르게 지정 */}
             <img 
-              src={`${process.env.REACT_APP_API_URL}/images/${movie.movie_image_name}`} 
+              src={`${process.env.REACT_APP_API_URL}/images/movie/${movie.movie_image_name}`} 
               alt={movie.movie_name} 
               style={{ width: '200px' }} 
             />
