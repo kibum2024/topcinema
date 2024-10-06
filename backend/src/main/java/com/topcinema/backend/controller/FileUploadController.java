@@ -1,7 +1,7 @@
 package com.topcinema.backend.controller;
 
-import com.topcinema.backend.model.Movie;
-import com.topcinema.backend.repository.MovieRepository;
+import com.topcinema.backend.model.Movies;
+import com.topcinema.backend.repository.MoviesRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +18,10 @@ import java.util.UUID;
 public class FileUploadController {
 
     // 영화 정보 저장하는 JPA Repository
-    private final MovieRepository movieRepository;
+    private final MoviesRepository moviesRepository;
 
-    public FileUploadController(MovieRepository movieRepository) {
-        this.movieRepository = movieRepository;
+    public FileUploadController(MoviesRepository moviesRepository) {
+        this.moviesRepository = moviesRepository;
     }
 
     // application.properties에서 설정된 파일 업로드 경로를 가져옴
@@ -33,7 +33,7 @@ public class FileUploadController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("movie_name") String movieName,
             @RequestParam("screening_time") String screeningTime,
-            @RequestParam("age_restriction") String ageRestriction,
+            @RequestParam("age_restriction") char ageRestriction,
             @RequestParam("view_count") Integer viewCount,
             @RequestParam("screening_start_date") String screeningStartDate,
             @RequestParam("screening_end_date") String screeningEndDate,
@@ -69,7 +69,7 @@ public class FileUploadController {
             file.transferTo(uploadPath);
 
             // 영화 정보 데이터베이스에 저장 (절대 경로가 아닌 파일명만 저장)
-            Movie movie = new Movie();
+            Movies movie = new Movies();
             movie.setMovie_name(movieName);  // setMovieName -> setMovie_name으로 수정
             movie.setScreening_time(screeningTime);  // 필드 이름에 맞춘 setter 사용
             movie.setAge_restriction(ageRestriction);
@@ -82,7 +82,7 @@ public class FileUploadController {
             movie.setDirector(director);
             movie.setMovie_image_name(fileName); // 파일명만 저장
             movie.setRegistration_date(screeningStartDate); // 등록일자를 상영 시작일로 설정
-            movieRepository.save(movie);
+            moviesRepository.save(movie);
 
             return new ResponseEntity<>("영화 정보와 파일 업로드 성공: " + fileName, HttpStatus.OK);
         } catch (IOException e) {

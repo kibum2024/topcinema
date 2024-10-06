@@ -1,0 +1,28 @@
+.kb-search-content {
+  margin: 0px;
+  text-align: right;
+}
+
+.kb-row:hover {
+  background-color: rgb(237, 246, 255);
+}
+
+.kb-even-color {
+  background-color: #f8f8f8;
+}
+
+.kb-row-selected {
+  background-color: rgb(188, 223, 251);
+}
+
+.kb-search-content input {
+  width: 200px;
+  font-size: 14px;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+}
+
+.kb-search-input::placeholder {
+  color: #ccc; 
+  opacity: 1; 
+}

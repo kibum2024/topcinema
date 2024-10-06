@@ -79,6 +79,7 @@ button,
 figure {
   margin: 0;
   padding: 0;
+  user-select: none;
 }
 
 html,
@@ -111,7 +112,10 @@ input {
   border: 1px solid rgb(236, 239, 243);
   padding: 0px 5px;
 }
-
+textarea {
+  border-radius: 6px;
+  border: 1px solid rgb(236, 239, 243);
+}
 button {
   border: none;
   cursor: pointer;
@@ -149,7 +153,9 @@ a {
 
 img {
   vertical-align: top;
-  border: 0
+  border-radius: 6px;
+  border: none;
+  /* border: 1px solid rgb(236, 239, 243); */
 }
 
 table {
@@ -169,4 +175,32 @@ caption {
 
 em {
   font-style: normal;
+}
+.compulsory-item {
+  color: red;
+}
+
+.width50 {
+  width: 50px;
+}
+.width100 {
+  width: 100px;
+}
+.width150 {
+  width: 150px;
+}
+.width200 {
+  width: 200px;
+}
+.width250 {
+  width: 250px;
+}
+.width300 {
+  width: 300px;
+}
+.width350 {
+  width: 350px;
+}
+.width400 {
+  width: 400px;
 }

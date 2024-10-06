@@ -1,0 +1,102 @@
+[
+  {
+    "ranking": 1,
+    "movie_name": "오빠, 남진",
+    "age_restriction": "12",
+    "movie_image_name": "21491_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 1,
+    "rating": 7.4000,
+    "reservation_rate": "18.2%"
+  },
+  {
+    "ranking": 2,
+    "movie_name": "위국일기",
+    "age_restriction": "12",
+    "movie_image_name": "21598_103_1.jpg",
+    "screening_status": "D-8",
+    "movie_code": 4,
+    "rating": 6.4000,
+    "reservation_rate": "17.8%"
+  },
+  {
+    "ranking": 3,
+    "movie_name": "조커: 폴리 아 되",
+    "age_restriction": "15",
+    "movie_image_name": "21476_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 3,
+    "rating": 9.4000,
+    "reservation_rate": "17.2%"
+  },
+  {
+    "ranking": 1,
+    "movie_name": "오빠, 남진",
+    "age_restriction": "12",
+    "movie_image_name": "21491_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 1,
+    "rating": 7.4000,
+    "reservation_rate": "18.2%"
+  },
+  {
+    "ranking": 2,
+    "movie_name": "위국일기",
+    "age_restriction": "12",
+    "movie_image_name": "21598_103_1.jpg",
+    "screening_status": "D-8",
+    "movie_code": 4,
+    "rating": 6.4000,
+    "reservation_rate": "17.8%"
+  },
+  {
+    "ranking": 3,
+    "movie_name": "조커: 폴리 아 되",
+    "age_restriction": "15",
+    "movie_image_name": "21476_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 3,
+    "rating": 9.4000,
+    "reservation_rate": "17.2%"
+  },
+  {
+    "ranking": 1,
+    "movie_name": "오빠, 남진",
+    "age_restriction": "12",
+    "movie_image_name": "21491_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 1,
+    "rating": 7.4000,
+    "reservation_rate": "18.2%"
+  },
+  {
+    "ranking": 2,
+    "movie_name": "위국일기",
+    "age_restriction": "12",
+    "movie_image_name": "21598_103_1.jpg",
+    "screening_status": "D-8",
+    "movie_code": 4,
+    "rating": 6.4000,
+    "reservation_rate": "17.8%"
+  },
+  {
+    "ranking": 3,
+    "movie_name": "조커: 폴리 아 되",
+    "age_restriction": "15",
+    "movie_image_name": "21476_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 3,
+    "rating": 9.4000,
+    "reservation_rate": "17.2%"
+  },
+  {
+    "ranking": 4,
+    "movie_name": "새벽의 모든",
+    "age_restriction": "전체관람가",
+    "movie_image_name": "21542_103_1.jpg",
+    "screening_status": "play",
+    "movie_code": 2,
+    "rating": 6.4000,
+    "reservation_rate": "16.2%"
+  }
+]

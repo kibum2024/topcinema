@@ -1,0 +1,26 @@
+.banner-wrap {
+  width: 100%;
+  height: auto;
+}
+
+.banner-view {
+  position: relative;
+  background-color: #1b262b;
+}
+
+.banner-view div {
+  display: flex;
+  justify-content: center;
+}
+
+.banner-view img {
+  cursor: pointer;
+}
+
+.banner-view-close {
+  position: absolute;
+  top: 20px;
+  right: 290px;
+  color: white;
+  cursor: pointer;
+}

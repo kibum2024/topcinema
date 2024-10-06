@@ -8,21 +8,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "movies")
-public class Movie {
+public class Movies {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_code")
-    private int movie_code;
+    private Integer movie_code;
 
     @Column(name = "movie_name", length = 100)
-    private String movie_name;  // JSON과 DB에서 모두 movie_name 사용
+    private String movie_name;
+
+    @Column(name = "movie_type", length = 1)
+    private char movie_type;
 
     @Column(name = "screening_time", length = 4)
     private String screening_time;
 
-    @Column(name = "age_restriction", length = 20)
-    private String age_restriction;
+    @Column(name = "age_restriction", length = 1)
+    private char age_restriction;
 
     @Column(name = "view_count")
     private Integer view_count;
@@ -32,6 +34,9 @@ public class Movie {
 
     @Column(name = "screening_end_date", length = 8)
     private String screening_end_date;
+
+    @Column(name = "interest_count")
+    private Integer interest_count;
 
     @Column(name = "movie_story", length = 2000)
     private String movie_story;
@@ -54,6 +59,4 @@ public class Movie {
     @Column(name = "user_code")
     private Integer user_code;
 
-    @Column(name = "image_path", length = 255)
-    private String image_path;
 }
