@@ -10,22 +10,22 @@ import lombok.Setter;
 @Table(name = "movies")
 public class Movies {
 
+    @Column(name = "movie_code")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "movie_code")
     private Integer movie_code;
 
     @Column(name = "movie_name", length = 100)
     private String movie_name;
 
     @Column(name = "movie_type", length = 1)
-    private char movie_type;
+    private String  movie_type;
 
     @Column(name = "screening_time", length = 4)
     private String screening_time;
 
-    @Column(name = "age_restriction", length = 1)
-    private char age_restriction;
+    @Column(name = "age_restriction", length = 20)
+    private String age_restriction;
 
     @Column(name = "view_count")
     private Integer view_count;

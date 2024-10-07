@@ -3,9 +3,9 @@ import KbCalendar from './KbCalendar';
 import { IoChevronDown, IoCalendarOutline } from "react-icons/io5";
 
 const KbInputDate = ({ dateProp, onChange }) => {
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedYear, setSelectedYear] = useState(dateProp.slice(0, 4));
+  const [selectedMonth, setSelectedMonth] = useState(dateProp.slice(4, 6));
+  const [selectedDate, setSelectedDate] = useState(dateProp.slice(6, 8));
   const [isYearDropdownVisible, setIsYearDropdownVisible] = useState(false);
   const [isMonthDropdownVisible, setIsMonthDropdownVisible] = useState(false);
   const [dropdownYearPosition, setDropdownYearPosition] = useState({ top: 0, left: 0 });
@@ -24,14 +24,10 @@ const KbInputDate = ({ dateProp, onChange }) => {
   const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 
   useEffect(() => {
-      let year = dateProp.slice(0, 4);
-      let month = dateProp.slice(4, 6);
-      let day = dateProp.slice(6, 8);
-      let formattedDate = new Date(year, month - 1, day);
-      setSelectedYear(formattedDate.getFullYear());
-      setSelectedMonth(String(formattedDate.getMonth() + 1).padStart(2, '0'));
-      setSelectedDate(String(formattedDate.getDate()).padStart(2, '0'));
-      onChange(selectedYear, selectedMonth, selectedDate);
+      setSelectedYear(dateProp.slice(0, 4));
+      setSelectedMonth(dateProp.slice(4, 6));
+      setSelectedDate(dateProp.slice(6, 8));
+      // onChange(selectedYear, selectedMonth, selectedDate);
   }, [dateProp]);
 
 

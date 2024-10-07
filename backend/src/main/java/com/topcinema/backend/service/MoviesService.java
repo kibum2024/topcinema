@@ -9,6 +9,7 @@ import com.topcinema.backend.repository.MoviesRepository;
 import com.topcinema.backend.model.Movies;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MoviesService {
@@ -28,31 +29,25 @@ public class MoviesService {
         return moviesRepository.findBestMovies();
     }
 
-    public Movies createMovies(Movies createdMovie) {
-        return moviesRepository.save(createdMovie);
+    public Movies createMovies(Movies movies) {
+        return moviesRepository.save(movies);
     }
 
-    public Movies updateMovies(int id, Movies updatedMovie) {
-        return moviesRepository.findById(id).map(movie -> {
-            // 영화 필드를 업데이트
-            movie.setMovie_name(updatedMovie.getMovie_name());
-            movie.setScreening_time(updatedMovie.getScreening_time());
-            movie.setAge_restriction(updatedMovie.getAge_restriction());
-            movie.setMovie_type(updatedMovie.getMovie_type());
-            movie.setView_count(updatedMovie.getView_count());
-            movie.setScreening_start_date(updatedMovie.getScreening_start_date());
-            movie.setScreening_end_date(updatedMovie.getScreening_end_date());
-            movie.setInterest_count(updatedMovie.getInterest_count());
-            movie.setMovie_story(updatedMovie.getMovie_story());
-            movie.setMovie_genre(updatedMovie.getMovie_genre());
-            movie.setNationality(updatedMovie.getNationality());
-            movie.setDirector(updatedMovie.getDirector());
-            movie.setMovie_image_name(updatedMovie.getMovie_image_name());
-            movie.setRegistration_date(updatedMovie.getRegistration_date());
-            movie.setUser_code(updatedMovie.getUser_code());
+    public Movies updateMoviesById(int id, Movies movies) {
+        Optional<Movies> existingEntity = moviesRepository.findById(id);
+        if (existingEntity.isPresent()) {
+            movies.setMovie_code(id); // ID 업데이트
+            return moviesRepository.save(movies);
+        }
+        return null;
+    }
 
-            // 저장 후 업데이트된 영화 반환
-            return moviesRepository.save(movie);
-        }).orElse(null); // 영화가 없을 경우 null 반환 또는 예외 처리 가능
+    public boolean deleteMovies(int id) {
+        Optional<Movies> movies = moviesRepository.findById(id);
+        if (movies.isPresent()) {
+            moviesRepository.delete(movies.get());
+            return true;
+        }
+        return false;
     }
 }

@@ -72,7 +72,7 @@ public class FileUploadController {
             Movies movie = new Movies();
             movie.setMovie_name(movieName);  // setMovieName -> setMovie_name으로 수정
             movie.setScreening_time(screeningTime);  // 필드 이름에 맞춘 setter 사용
-            movie.setAge_restriction(ageRestriction);
+//            movie.setAge_restriction(ageRestriction);
             movie.setView_count(viewCount);
             movie.setScreening_start_date(screeningStartDate);
             movie.setScreening_end_date(screeningEndDate);
