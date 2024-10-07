@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Store Info Extractor and Converter</title>
+</head>
+
+<body>
+  <h1>Store Info Extractor and Converter</h1>
+  <input type="file"
+         id="fileInput"
+         accept=".txt">
+  <button id="downloadJson">Download JSON</button>
+  <button id="downloadExcel">Download Excel</button>
+  <div id="output"></div>
+
+  <!-- SheetJS 라이브러리를 추가합니다 -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const htmlString = e.target.result;
+
+        // DOMParser를 이용해 문자열을 파싱
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // 모든 li 요소를 선택
+        const liElements = doc.querySelectorAll('ul > li');
+        const stores = [];
+
+        // console.log("liElements ",liElements); 
+        liElements.forEach(li => {
+          // onclick 속성의 값을 추출
+          const onclickContent = li.getAttribute('onclick');
+          const regex = /'([^']*)'/g;
+          const onclickData = [];
+          let match;
+          while ((match = regex.exec(onclickContent)) !== null) {
+            onclickData.push(match[1]);
+          }
+
+          // HTML 태그에서 정보 추출
+          // const event_name = li.querySelector('a').textContent;
+          let menu_name = '';
+          let menu_kind = '';
+          if (li.querySelector('a')) {
+            const atag = li.querySelector('a');
+            let title = '';
+            title = atag.getAttribute('title');
+            console.log("title ", title);
+
+            const href = atag.getAttribute('href');
+
+            let divisionCode = '';
+            let detailDivisionCode = '';
+            let screendivcd = '';
+            // URLSearchParams를 사용하여 쿼리 문자열을 파싱
+            if (href) {
+              let url;
+              try {
+                // href가 절대 경로가 아니면 상대 경로를 기준으로 URL 생성
+                if (href.startsWith('http')) {
+                  url = new URL(href); // 절대 경로의 URL일 경우 그대로 사용
+                } else {
+                  url = new URL(href, window.location.origin); // 상대 경로일 경우 현재 도메인 기준으로 URL 생성
+                }
+
+                const params = new URLSearchParams(url.search); // 쿼리 문자열을 파싱
+                divisionCode = params.get('divisionCode'); // divisionCode 값 추출
+                detailDivisionCode = params.get('detailDivisionCode'); // divisionCode 값 추출
+                screendivcd = params.get('screendivcd'); // screendivcd 값 추출
+              } catch (e) {
+                console.error("Invalid URL: ", href, e); // 잘못된 URL일 경우 에러 처리
+              }
+            }
+
+            if (title && divisionCode) {
+              menu_kind = '3';
+            } else if (title && detailDivisionCode) {
+              menu_kind = '3';
+            } else if (title && (!divisionCode || !detailDivisionCode)) {
+              menu_kind = '2';
+            } else if (!title) {
+              menu_kind = '1';
+            }
+            menu_name = li.querySelector('a').textContent;
+          }
+
+          const storeInfo = {
+            menu_kind,
+            menu_name,
+          };
+
+          stores.push(storeInfo);
+        });
+
+        // JSON 파일 생성
+        const jsonContent = JSON.stringify(stores, null, 2);
+        const output = document.getElementById('output');
+        output.innerHTML = `<pre>${jsonContent}</pre>`;
+
+        // Download JSON 버튼에 이벤트 추가
+        document.getElementById('downloadJson').addEventListener('click', function () {
+          const blob = new Blob([jsonContent], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'stores.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+
+        // Download Excel 버튼에 이벤트 추가
+        document.getElementById('downloadExcel').addEventListener('click', function () {
+          // JSON 데이터를 워크시트로 변환
+          const worksheet = XLSX.utils.json_to_sheet(stores);
+
+          // 워크북 생성
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Stores");
+
+          // 엑셀 파일 생성 및 다운로드
+          XLSX.writeFile(workbook, 'stores.xlsx');
+        });
+      };
+
+      reader.readAsText(file);
+    });
+
+  </script>
+</body>
+
+</html>

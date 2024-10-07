@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot 코드 생성기</title>
+    <script>
+        function generateCode() {
+            const tableStructure = document.getElementById('tableStructure').value;
+            const tableName = extractTableName(tableStructure);
+            const fields = extractFields(tableStructure);
+            const primaryKeyFields = extractPrimaryKeys(tableStructure);
+
+            if (!tableName || fields.length === 0) {
+                alert("테이블 구조를 정확히 입력해 주세요.");
+                return;
+            }
+
+            // Model Class
+            let modelCode = `package com.topcinema.backend.model;\n\nimport jakarta.persistence.*;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Entity\n@Getter\n@Setter\n@Table(name = "${tableName}")\n`;
+
+            if (primaryKeyFields.length > 1) {
+                modelCode += `@IdClass(${capitalize(tableName)}Id.class)\n`;
+            }
+
+            modelCode += `public class ${capitalize(tableName)} {\n\n`;
+
+            fields.forEach(field => {
+                if (["CREATE", "SELECT", "INSERT", "DELETE", "UPDATE", "TABLE"].includes(field.name.toUpperCase())) return;
+
+                modelCode += `    @Column(name = "${field.name}"${field.length ? `, length = ${field.length}` : ''})\n`;
+                if (primaryKeyFields.includes(field.name)) {
+                    modelCode += `    @Id\n`;
+                }
+                modelCode += `    private ${convertType(field.type)} ${field.name};\n\n`;
+            });
+
+            modelCode += `}\n`;
+
+            // ID Class (for composite key)
+            let idClassCode = '';
+            if (primaryKeyFields.length > 1) {
+                idClassCode = `package com.topcinema.backend.model;\n\nimport java.io.Serializable;\nimport java.util.Objects;\n\npublic class ${capitalize(tableName)}Id implements Serializable {\n\n`;
+                primaryKeyFields.forEach(pkField => {
+                    const field = fields.find(f => f.name === pkField);
+                    idClassCode += `    private ${convertType(field.type)} ${field.name};\n\n`;
+                });
+
+                idClassCode += `
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ${capitalize(tableName)}Id that = (${capitalize(tableName)}Id) o;
+        return ${primaryKeyFields.map(pkField => `Objects.equals(${pkField}, that.${pkField})`).join(' && ')}; 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(${primaryKeyFields.join(', ')});
+    }\n`;
+
+                idClassCode += `}\n`;
+            }
+
+            // Repository Interface
+            const repositoryCode = `package com.topcinema.backend.repository;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\n@Repository\npublic interface ${capitalize(tableName)}Repository extends JpaRepository<${capitalize(tableName)}, ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'Integer'}> {\n}\n`;
+
+            // Service Class
+            const serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n}\n`;
+
+            // Controller Class
+            const controllerCode = `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n}\n`;
+
+            document.getElementById('model').value = modelCode;
+            document.getElementById('repository').value = repositoryCode;
+            document.getElementById('service').value = serviceCode;
+            document.getElementById('controller').value = controllerCode;
+            if (idClassCode) {
+                document.getElementById('idClass').value = idClassCode;
+            } else {
+                document.getElementById('idClass').value = "복합 키가 없습니다.";
+            }
+        }
+
+        function extractTableName(structure) {
+            const match = structure.match(/CREATE TABLE (\w+)/);
+            return match ? match[1] : '';
+        }
+
+        function extractFields(structure) {
+            const fieldLines = structure.split('\n').filter(line => line.trim().match(/^\s*\w+.*$/));
+            return fieldLines.map(line => {
+                const [name, type] = line.trim().split(/\s+/);
+                const length = type.match(/\((\d+)\)/);
+                return { name: name.replace(',', ''), type: type.replace(/,\d+/g, ''), length: length ? parseInt(length[1]) : null };
+            }).filter(field => field.name !== 'PRIMARY');
+        }
+
+        function extractPrimaryKeys(structure) {
+            const match = structure.match(/PRIMARY KEY\s*\(([^)]+)\)/);
+            return match ? match[1].split(',').map(field => field.trim()) : [];
+        }
+
+        function saveTextAsFile(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        function capitalize(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+
+        // 수정된 타입 변환 함수
+        function convertType(sqlType) {
+            // sqlType을 소문자로 변환하여 비교
+            switch (sqlType.toLowerCase()) {
+                case 'int':
+                case 'int,':
+                case 'integer':    // SQL에서는 int와 integer는 같은 타입으로 간주
+                    return 'Integer';  // int나 integer 타입을 Java의 Integer로 변환
+                case 'char(1)':
+                    return 'char';  // 단일 문자(char)
+                case 'varchar(100)':
+                case 'varchar(20)':
+                case 'varchar(2000)':
+                case 'varchar(200)':
+                case 'varchar':
+                    return 'String';  // varchar 타입을 String으로 변환
+                case 'char(4)':
+                case 'char(8)':
+                case 'char':
+                    return 'String';  // 길이에 상관없이 char 타입을 String으로 변환
+                default:
+                    return 'String';  // 기본값은 String으로 설정
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Spring Boot 코드 생성기</h1>
+    <textarea id="tableStructure" rows="10" cols="80" placeholder="테이블 구조를 여기에 입력하세요"></textarea><br>
+    <button onclick="generateCode()">코드 생성</button>
+
+    <h2>모델 코드</h2>
+    <textarea id="model" rows="20" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('model').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + '.java')">모델 저장</button>
+
+    <h2>ID 클래스 코드 (복합 키)</h2>
+    <textarea id="idClass" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('idClass').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Id.java')">ID 클래스 저장</button>
+
+    <h2>리포지토리 코드</h2>
+    <textarea id="repository" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('repository').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Repository.java')">리포지토리 저장</button>
+
+    <h2>서비스 코드</h2>
+    <textarea id="service" rows="15" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('service').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Service.java')">서비스 저장</button>
+
+    <h2>컨트롤러 코드</h2>
+    <textarea id="controller" rows="15" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('controller').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Controller.java')">컨트롤러 저장</button>
+
+    <br><br>
+    <button onclick="saveAll()">전체 저장</button>
+
+    <script>
+        function saveAll() {
+            const tableName = capitalize(extractTableName(document.getElementById('tableStructure').value));
+            saveTextAsFile(document.getElementById('model').value, tableName + '.java');
+            saveTextAsFile(document.getElementById('idClass').value, tableName + 'Id.java');
+            saveTextAsFile(document.getElementById('repository').value, tableName + 'Repository.java');
+            saveTextAsFile(document.getElementById('service').value, tableName + 'Service.java');
+            saveTextAsFile(document.getElementById('controller').value, tableName + 'Controller.java');
+        }
+    </script>
+</body>
+</html>

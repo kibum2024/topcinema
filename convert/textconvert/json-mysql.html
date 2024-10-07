@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON to MySQL Insert</title>
+</head>
+<body>
+    <h1>JSON 데이터를 MySQL Insert 문으로 변환</h1>
+
+    <label for="tableName">테이블명 입력:</label>
+    <input type="text" id="tableName" placeholder="테이블명을 입력하세요">
+    <br><br>
+
+    <label for="jsonFile">JSON 파일 선택:</label>
+    <input type="file" id="jsonFile" accept=".json">
+    <br><br>
+
+    <button onclick="generateInsert()">Insert 문 생성</button>
+    <br><br>
+
+    <textarea id="output" rows="10" cols="80" readonly></textarea>
+    <br><br>
+
+    <button onclick="saveToFile()">파일로 저장</button>
+
+    <script>
+        function generateInsert() {
+            const tableName = document.getElementById('tableName').value;
+            const fileInput = document.getElementById('jsonFile');
+            const outputArea = document.getElementById('output');
+
+            if (!tableName) {
+                alert('테이블명을 입력하세요.');
+                return;
+            }
+
+            if (!fileInput.files.length) {
+                alert('JSON 파일을 선택하세요.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                try {
+                    const jsonData = JSON.parse(event.target.result);
+                    let insertStatements = "";
+
+                    jsonData.forEach((item) => {
+                        let columns = [];
+                        let values = [];
+
+                        for (const key in item) {
+                            columns.push(key);
+                            // 값이 문자열인 경우 쿼리에서 따옴표로 감싸기
+                            if (typeof item[key] === 'string' || item[key] === null) {
+                                values.push(item[key] === null ? "NULL" : `'${item[key]}'`);
+                            } else {
+                                values.push(item[key]);
+                            }
+                        }
+
+                        const columnString = columns.join(", ");
+                        const valueString = values.join(", ");
+                        insertStatements += `INSERT INTO ${tableName} (${columnString}) VALUES (${valueString});\n`;
+                    });
+
+                    outputArea.value = insertStatements;
+
+                } catch (error) {
+                    alert('JSON 파일을 파싱하는 중 오류가 발생했습니다.');
+                    console.error(error);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function saveToFile() {
+            const outputArea = document.getElementById('output');
+            const blob = new Blob([outputArea.value], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+
+            link.href = URL.createObjectURL(blob);
+            link.download = "insert_statements.sql";
+            link.click();
+        }
+    </script>
+</body>
+</html>

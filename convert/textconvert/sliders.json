@@ -1,0 +1,43 @@
+[
+    {
+      "slider_code" : 1,
+      "slider_name" : "아마존 활명수",
+      "slider_position" : "1",
+      "slider_image_name" : "AmazonBullseye_1920774.jpg",
+      "slider_enable" : "1",
+      "slider_url" : "https:\/\/cf2.lottecinema.co.kr\/lotte_image\/2024\/AmazonBullseye\/AmazonBullseye_1280720.mp4"
+    },
+    {
+      "slider_code" : 2,
+      "slider_name" : "할머니가 죽기 전에 백만장자가 되는 법",
+      "slider_position" : "1",
+      "slider_image_name" : "GrandMa_1920774_2.jpg",
+      "slider_enable" : "1",
+      "slider_url" : "https:\/\/cf2.lottecinema.co.kr\/lotte_image\/2024\/GrandMa\/GrandMa_1280720.mp4"
+    },
+    {
+      "slider_code" : 3,
+      "slider_name" : "마이펫의 컴백홈 어드벤처",
+      "slider_position" : "1",
+      "slider_image_name" : "MyPet_1920774.jpg",
+      "slider_enable" : "1",
+      "slider_url" : "https:\/\/cf2.lottecinema.co.kr\/lotte_image\/2024\/MyPet\/MyPet_1280720.mp4"
+    },
+    {
+      "slider_code" : 4,
+      "slider_name" : "나의 영원한 친구",
+      "slider_position" : "1",
+      "slider_image_name" : "MyLovelyPartner_19207743.jpg",
+      "slider_enable" : "1",
+      "slider_url" : "https:\/\/cf2.lottecinema.co.kr\/lotte_image\/2024\/MyLovelyPartner\/MyLovelyPartner_12807203.mp4"
+    },
+    {
+      "slider_code" : 5,
+      "slider_name" : "구룡성채 무법지대",
+      "slider_position" : "1",
+      "slider_image_name" : "TwilightOfTheWarriors_1920774.jpg",
+      "slider_enable" : "1",
+      "slider_url" : "https:\/\/cf2.lottecinema.co.kr\/lotte_image\/2024\/TwilightOfTheWarriors\/TwilightOfTheWarriors_1280720.mp4"
+    }
+  ]
+  

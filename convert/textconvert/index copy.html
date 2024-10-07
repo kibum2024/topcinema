@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Movie Info Extractor</title>
+</head>
+
+<body>
+  <h1>Movie Info Extractor</h1>
+  <input type="file"
+         id="fileInput"
+         accept=".txt, .html">
+  <button id="downloadJson">Download JSON</button>
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const htmlString = e.target.result;
+
+        // DOMParser를 이용해 HTML 문자열을 파싱
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // 여러 개의 <div id="contents_new23"> 태그를 선택
+        const contentDivs = doc.querySelectorAll('div#contents_new23');
+        const allData = [];
+
+        contentDivs.forEach(contentDiv => {
+          const data = {};
+
+          // 영화명 (movie_name) 추출
+          const movieName = contentDiv.querySelector('div.tit_info strong') ? contentDiv.querySelector('div.tit_info strong').textContent.trim() : '';
+          data.movie_name = movieName;
+
+          // <div class="poster_info"> 밑의 img 태그에서 이미지 파일명 추출
+          let imgSrc = contentDiv.querySelector('div.poster_info img') ? decodeURI(contentDiv.querySelector('div.poster_info img').src) : '';
+          if (imgSrc) {
+            const lastSlashIndex = imgSrc.lastIndexOf('/');
+            const imgFilename = imgSrc.substring(lastSlashIndex + 1);
+            data.movie_image_name = imgFilename;
+          }
+
+          // 영화 시간 추출: "84분" -> "84"로 변환
+          const movieTimeElement = contentDiv.querySelector('span.time');
+          const movieTime = movieTimeElement ? movieTimeElement.textContent.trim().replace('분', '') : '';
+          data.screening_time = movieTime;
+
+          // 영화 설명 추출
+          const movieDescription = contentDiv.querySelector('div.txtarea span') ? contentDiv.querySelector('div.txtarea span').textContent.trim() : '';
+          data.movie_story = movieDescription;
+
+          // 관람수 (view_count) 추출 (예: "6,939명" -> "6939", "명"이 포함된 경우에만 추출)
+          const viewCountElement = contentDiv.querySelector('li:has(span.roboto)');
+          const viewCountText = viewCountElement ? viewCountElement.textContent : '';
+          data.view_count = viewCountText.includes('명') 
+                            ? viewCountText.replace(/[^0-9]/g, '') 
+                            : '';
+
+          // 상영 시작일자 (screening_start_date) 추출 (예: "2024.09.04 개봉" -> "20240904")
+          const screeningStartDateElement = contentDiv.querySelector('li:has(span.roboto)');
+          let screeningStartDate = screeningStartDateElement ? screeningStartDateElement.textContent.trim() : '';
+          
+          // 상영 시작일자 포맷 변환 (YYYY.MM.DD -> YYYYMMDD)
+          screeningStartDate = screeningStartDate.replace(/\./g, '').replace(' 개봉', '');
+          data.screening_start_date = screeningStartDate;
+
+          // 상영 종료일자 (screening_end_date) 설정: 상영 시작일자 + 1개월
+          if (data.screening_start_date) {
+            const startDate = new Date(`${screeningStartDate.substring(0, 4)}-${screeningStartDate.substring(4, 6)}-${screeningStartDate.substring(6, 8)}`);
+            startDate.setMonth(startDate.getMonth() + 1);  // 한 달 추가
+            const year = startDate.getFullYear();
+            const month = ('0' + (startDate.getMonth() + 1)).slice(-2);
+            const day = ('0' + startDate.getDate()).slice(-2);
+            data.screening_end_date = `${year}${month}${day}`; // YYYYMMDD 형식으로 변환
+          }
+
+          // 관람 나이 제한 (age_restriction) 추출
+          const ageRestrictionElement = contentDiv.querySelector('li span.grade_txt span.roboto');
+          data.age_restriction = ageRestrictionElement ? ageRestrictionElement.textContent.trim() : '';
+
+          // <em> 태그와 <span> 태그의 데이터를 추출 (예: 장르, 감독, 출연자 등)
+          const detailInfoItems = contentDiv.querySelectorAll('ul.detail_info2 li');
+          detailInfoItems.forEach(item => {
+            const emTag = item.querySelector('em');
+            const spanTag = item.querySelector('span');
+            if (emTag && spanTag) {
+              const title = emTag.textContent.trim();  // <em> 태그의 내용
+              let value = spanTag.textContent.trim();  // <span> 태그의 내용
+
+              // 장르와 국적을 나누어 추출
+              if (title === '장르') {
+                const [genre, nationality] = value.split(' / ');
+                data.movie_genre = genre ? genre.trim() : '';
+                data.nationality = nationality ? nationality.trim() : '';
+              }
+
+              // 감독을 director로 저장
+              if (title === '감독') {
+                data.director = value;
+              }
+
+              // 출연진을 actors로 저장
+              if (title === '출연') {
+                data.actors = value;
+              }
+            }
+          });
+
+          // 트레일러 정보 추출
+          const trailerItems = contentDiv.querySelectorAll('div.item');
+          const trailers = [];
+          trailerItems.forEach(item => {
+            const trailerImg = item.querySelector('img') ? decodeURI(item.querySelector('img').src) : '';
+            const trailerTitle = item.querySelector('strong') ? item.querySelector('strong').textContent.trim() : '';
+            if (trailerImg && trailerTitle) {
+              const lastSlashIndex = trailerImg.lastIndexOf('/');
+              const trailerFilename = trailerImg.substring(lastSlashIndex + 1);
+              trailers.push({
+                trailer_title: trailerTitle,
+                trailer_image: trailerFilename
+              });
+            }
+          });
+          data.trailers = trailers;
+
+          // 스틸컷 이미지명 추출 (img 태그에서 이미지 파일명만 추출)
+          const stillCutImages = contentDiv.querySelectorAll('img[src*="MovieFile/MovieImg"]');
+          const stillCuts = [];
+          stillCutImages.forEach(img => {
+            const imgSrc = decodeURI(img.src);
+            const lastSlashIndex = imgSrc.lastIndexOf('/');
+            const imgFilename = imgSrc.substring(lastSlashIndex + 1);
+            stillCuts.push(imgFilename);
+          });
+          data.still_cuts = stillCuts;
+
+          // 각 영화 정보를 allData 배열에 추가
+          allData.push(data);
+        });
+
+        // 추출된 데이터를 JSON 형식으로 출력
+        const jsonContent = JSON.stringify(allData, null, 2);
+        const output = document.getElementById('output');
+        output.innerHTML = `<pre>${jsonContent}</pre>`;
+
+        // JSON 다운로드 버튼에 이벤트 추가
+        document.getElementById('downloadJson').addEventListener('click', function () {
+          const blob = new Blob([jsonContent], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'movies_info.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      };
+
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+
+</html>

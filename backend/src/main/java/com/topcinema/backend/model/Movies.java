@@ -11,6 +11,7 @@ import lombok.Setter;
 public class Movies {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "movie_code")
     private Integer movie_code;
 

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Store Info Extractor and Converter</title>
+</head>
+
+<body>
+  <h1>Store Info Extractor and Converter</h1>
+  <input type="file"
+         id="fileInput"
+         accept=".txt">
+  <button id="downloadJson">Download JSON</button>
+  <button id="downloadExcel">Download Excel</button>
+  <div id="output"></div>
+
+  <!-- SheetJS 라이브러리를 추가합니다 -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const htmlString = e.target.result;
+
+        // DOMParser를 이용해 문자열을 파싱
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // 모든 li 요소를 선택
+        const liElements = doc.querySelectorAll('ul#eventListContent > li');
+        const stores = [];
+
+        // console.log("liElements ",liElements); 
+        liElements.forEach(li => {
+          // onclick 속성의 값을 추출
+          const onclickContent = li.getAttribute('onclick');
+          const regex = /'([^']*)'/g;
+          const onclickData = [];
+          let match;
+          while ((match = regex.exec(onclickContent)) !== null) {
+            onclickData.push(match[1]);
+          }
+
+          // console.log("li ",li);
+
+          // HTML 태그에서 정보 추출
+          const event_name = li.querySelector('strong').textContent;
+          let event_date ='';
+          if (li.querySelector('em')) {
+            event_date = li.querySelector('em').textContent;
+          }
+          // const imageUrl = li.querySelector('img').src;
+          // const eventImg = imageUrl.includes('%') ? imageUrl : encodeURI(imageUrl);
+
+          let event_img = decodeURI(li.querySelector('img').src);
+          const lastSlashIndex = event_img.lastIndexOf('/');
+          event_img = event_img.substring(lastSlashIndex + 1);
+
+          let event_stat = '';
+          if (event_date !== '') {
+            event_stat = 'open';
+          } else {
+            event_stat = 'close';
+          }
+
+
+          const storeInfo = {
+            event_name,
+            event_img,
+            event_date,
+            event_stat
+          };
+
+          stores.push(storeInfo);
+        });
+
+        // JSON 파일 생성
+        const jsonContent = JSON.stringify(stores, null, 2);
+        const output = document.getElementById('output');
+        output.innerHTML = `<pre>${jsonContent}</pre>`;
+
+        // Download JSON 버튼에 이벤트 추가
+        document.getElementById('downloadJson').addEventListener('click', function () {
+          const blob = new Blob([jsonContent], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'stores.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+
+        // Download Excel 버튼에 이벤트 추가
+        document.getElementById('downloadExcel').addEventListener('click', function () {
+          // JSON 데이터를 워크시트로 변환
+          const worksheet = XLSX.utils.json_to_sheet(stores);
+
+          // 워크북 생성
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Stores");
+
+          // 엑셀 파일 생성 및 다운로드
+          XLSX.writeFile(workbook, 'stores.xlsx');
+        });
+      };
+
+      reader.readAsText(file);
+    });
+
+  </script>
+</body>
+
+</html>

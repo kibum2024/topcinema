@@ -7,16 +7,18 @@ const KbRadioButton = ({ itemProp, widthProp, itemDatasProp, selectedItemProp, o
   // itemDatasProp와 selectedItemProp이 변경될 때마다 실행
   useEffect(() => {
     if (itemDatasProp) {
-      // itemDatas 상태값을 갱신
       setItemDatas(itemDatasProp);
 
       if (selectedItemProp) {
-        // selectedItemProp 값에 해당하는 인덱스 찾기
         const findIndex = itemDatasProp.findIndex(item => item.common_code === selectedItemProp);
 
-        // 인덱스가 존재하면 해당 인덱스로 설정, 없으면 0으로 설정
+        console.log("itemDatasProp : ", itemDatasProp);
+        console.log("findIndex : ", findIndex);
+        console.log("selectedItemProp : ", selectedItemProp);
+
         if (findIndex !== -1) {
           setCurrentIndex(findIndex);
+          // onClick(findIndex);
         } else {
           setCurrentIndex(0);
         }
@@ -24,7 +26,7 @@ const KbRadioButton = ({ itemProp, widthProp, itemDatasProp, selectedItemProp, o
         setCurrentIndex(0);
       }
     }
-  }, [itemDatasProp, selectedItemProp]); // 의존성 배열에 추가
+  }, [itemDatasProp, selectedItemProp]); 
 
   const selectedItem = (index) => {
     setCurrentIndex(index);

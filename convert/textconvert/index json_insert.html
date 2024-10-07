@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON to SQL Converter</title>
+</head>
+<body>
+  <h1>JSON to SQL Converter</h1>
+
+  <label for="tableName">Table Name: </label>
+  <input type="text" id="tableName" placeholder="Enter table name" />
+
+  <input type="file" id="fileInput" accept=".json" />
+  <button id="downloadSQL">Download SQL</button>
+
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const jsonString = e.target.result;
+        const jsonData = JSON.parse(jsonString);
+
+        const tableName = document.getElementById('tableName').value || 'menus';  // 테이블명을 입력받음, 기본값은 'menus'
+
+        let sqlStatements = `-- SQL Insert Statements for ${tableName} Table\n`;
+
+        // 대분류, 중분류, 소분류를 추적하는 변수
+        let mainCategoryCounter = 0;
+        let subCategoryCounter = 0;
+        let smallCategoryCounter = 0;
+
+        let lastMenuKind = '';  // 마지막 menu_kind 값을 저장해 비교
+
+        jsonData.forEach(item => {
+          let menuKind = item.menu_kind ? item.menu_kind : 'NULL';
+          let menuName = item.menu_name ? `'${item.menu_name}'` : 'NULL';
+
+          // main_category, sub_category, small_category 초기화
+          let mainCategory = '';
+          let subCategory = '';
+          let smallCategory = '';
+
+          // // 메뉴 종류가 변경되면 대분류 증가, 중분류, 소분류 초기화
+          // if (menuKind !== lastMenuKind) {
+          //   mainCategoryCounter++;
+          //   subCategoryCounter = 0;  // 중분류 초기화
+          //   smallCategoryCounter = 0;  // 소분류 초기화
+          //   lastMenuKind = menuKind;  // 현재 menu_kind 저장
+          // }
+
+          // menu_kind에 따라 대분류, 중분류, 소분류 설정
+          if (menuKind === '1') {
+            mainCategoryCounter++;
+            mainCategory = String(mainCategoryCounter).padStart(2, '0');  // 대분류
+            subCategoryCounter = 0;
+            smallCategoryCounter = 0;
+            subCategory = '00';  // 중분류 초기화
+            smallCategory = '00';  // 소분류 초기화
+          } else if (menuKind === '2') {
+            mainCategory = String(mainCategoryCounter).padStart(2, '0');  // 대분류 그대로 유지
+            subCategoryCounter++;
+            subCategory = String(subCategoryCounter).padStart(2, '0');  // 중분류 증가
+            smallCategoryCounter = 0;
+            smallCategory = '00';  // 소분류 초기화
+          } else if (menuKind === '3') {
+            mainCategory = String(mainCategoryCounter).padStart(2, '0');  // 대분류 그대로 유지
+            subCategory = String(subCategoryCounter).padStart(2, '0');  // 중분류 그대로 유지
+            smallCategoryCounter++;
+            smallCategory = String(smallCategoryCounter).padStart(2, '0');  // 소분류 증가
+          }
+
+          // SQL 구문 생성
+          const sql = `INSERT INTO ${tableName} (menu_kind, menu_name, menu_main, menu_sub, menu_small) 
+                       VALUES ('${menuKind}', ${menuName}, '${mainCategory}', '${subCategory}', '${smallCategory}');\n`;
+          sqlStatements += sql;
+        });
+
+        // 결과를 출력 (옵션)
+        document.getElementById('output').innerHTML = `<pre>${sqlStatements}</pre>`;
+
+        // SQL 다운로드 버튼 설정
+        document.getElementById('downloadSQL').addEventListener('click', function () {
+          const blob = new Blob([sqlStatements], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'insert_menus.sql';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      };
+
+      reader.readAsText(file);
+    });
+
+  </script>
+</body>
+</html>

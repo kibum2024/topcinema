@@ -1,0 +1,726 @@
+[
+  {
+    "menu_kind": "1",
+    "menu_name": "예매"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "예매하기"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "상영시간표"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "할인안내"
+  },
+  {
+    "menu_kind": "1",
+    "menu_name": "영화"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "홈"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "현재상영작"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "상영예정작"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "아르떼"
+  },
+  {
+    "menu_kind": "1",
+    "menu_name": "영화관"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "스페셜관"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "홈"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "샤롯데"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수퍼플렉스"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수퍼MX4D"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수퍼 4D"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수퍼LED"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광음시네마"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "리클라이너"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "씨네패밀리"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "씨네커플"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "씨네비즈"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "서울"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "가산디지털"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "가양"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "강동"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "건대입구"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "김포공항"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "노원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "도곡"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "독산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서울대입구"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수락산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수유"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "신대방(구로디지털역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "신도림"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "신림"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "에비뉴엘(명동)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "영등포"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "용산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "월드타워"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "은평(롯데몰)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "중랑"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "청량리"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "합정"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "홍대입구"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "경기/인천"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광교아울렛"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광명(광명사거리)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광명아울렛"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광주터미널"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "구리아울렛"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "동탄"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "라페스타"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "마석"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "별내"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "병점"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부천(신중동역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부천역"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부평"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부평갈산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부평역사"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "북수원(천천동)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "산본피트인"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서수원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "성남중앙(신흥역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "센트럴락"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "송탄"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수원(수원역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수지"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "시화(정왕역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "시흥장현"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "안산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "안산고잔"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "안성"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "안양(안양역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "안양일번가"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "오산원동"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "용인기흥"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "용인역북"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "위례"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "의정부민락"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "인덕원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "인천아시아드"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "인천터미널"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "주엽"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "진접"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "파주롯데아울렛"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "파주운정"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "판교(창조경제밸리)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "평촌(범계역)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "하남미사"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "향남"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "충청/대전"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "당진"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대전(백화점)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대전관저"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대전센트럴"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서청주(아울렛)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "아산터미널"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "오송"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "천안불당"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "천안청당"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "청주용암"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "충주(모다아울렛)"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "전라/광주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광주(백화점)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광주광산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광주첨단"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "군산나운"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "군산몰"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "수완(아울렛)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "익산모현"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "전주(백화점)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "전주송천"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "전주평화"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "충장로"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "경북/대구"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "경주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "경주황성"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "구미공단"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대구광장"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대구율하"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "대구현풍"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "동성로"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "상인"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "상주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "성서"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "영주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "영천"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "포항"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "프리미엄구미센트럴"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "프리미엄안동"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "프리미엄칠곡"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "경남/부산/울산"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "거창"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "광복"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "김해부원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "김해아울렛(장유)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "동래"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "동부산아울렛"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "마산(합성동)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부산명지"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부산본점"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "부산장림"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "사천"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서면(전포동)(종료)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "센텀시티"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "양산물금"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "엠비씨네(진주)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "오투(부산대)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "울산(백화점)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "울산성남"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "진주혁신(롯데몰)"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "진해"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "창원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "통영"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "프리미엄경남대"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "프리미엄해운대(장산역)"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "강원"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "강릉"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "남원주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "동해"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "원주무실"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "춘천"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "제주"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "서귀포"
+  },
+  {
+    "menu_kind": "3",
+    "menu_name": "제주연동"
+  },
+  {
+    "menu_kind": "1",
+    "menu_name": "이벤트"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "홈"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "영화"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "시사회/무대인사"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "HOT"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "제휴할인"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "우리동네영화관"
+  },
+  {
+    "menu_kind": "1",
+    "menu_name": "스토어"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "베스트"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "관람권"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "스낵음료"
+  },
+  {
+    "menu_kind": "2",
+    "menu_name": "포토카드"
+  }
+]

@@ -231,7 +231,7 @@ function ManagerMenu() {
         </div>
         <div
           style={{
-            height: `${windowSize.height - 48}px`,
+            height: `${windowSize.height - 65}px`,
           }}
         >
           <TabMenu ref={tabsRef} />

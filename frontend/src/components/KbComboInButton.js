@@ -2,12 +2,31 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IoChevronDown } from "react-icons/io5";
 
 const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightProp, onClick }) => {
-  const [selectedData, setSelectedData] = useState(comboDataProp.find(item => item.common_code === userProp)?.common_name); 
-  const [isDataDropdownVisible, setIsDataDropdownVisible] = useState(false); 
+  const [selectedData, setSelectedData] = useState("");
+  const [isDataDropdownVisible, setIsDataDropdownVisible] = useState(false);
   const [dropdownDataPosition, setDropdownDataPosition] = useState({ top: 0, left: 0 });
   const [dropdownWidth, setDropdownWidth] = useState(comboWidthProp + 9);
-  const inputDataRef = useRef(null); 
-  const dropdownDataRef = useRef(null); 
+  const inputDataRef = useRef(null);
+  const dropdownDataRef = useRef(null);
+
+
+  useEffect(() => {
+    if (comboDataProp) {
+
+      if (userProp) {
+        const findCode = comboDataProp.find(item => item.common_code === userProp);
+
+        if (findCode) {
+          setSelectedData(findCode.common_name);
+        } else {
+          setSelectedData("ALL");
+        }
+      } else {
+        setSelectedData("ALL");
+      }
+    }
+  }, [comboDataProp, userProp]);
+
 
   const InputDataChange = (e) => {
     setSelectedData(e.target.value);
@@ -15,7 +34,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
 
   const selectDataChange = (comboData) => {
     setSelectedData(comboData.common_name);
-    setIsDataDropdownVisible(false); 
+    setIsDataDropdownVisible(false);
 
     if (onClick) {
       onClick(comboData.common_code);
@@ -32,7 +51,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
       const inputRect = inputDataRef.current.getBoundingClientRect();
       setDropdownDataPosition({
         top: inputRect.bottom,
-        left: inputRect.left, 
+        left: inputRect.left,
       });
     }
   };
@@ -51,24 +70,24 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
 
   const preventScroll = (e) => {
     const dropdownRefs = [dropdownDataRef];
-  
+
     const isInAnyDropdown = dropdownRefs.some(ref => ref.current && ref.current.contains(e.target));
     const isCurrent = dropdownRefs.some(ref => ref.current && ref.current.contains(e.target));
-  
+
     if (isInAnyDropdown) {
       const target = isCurrent.current;
-      
+
       if (target) {
         const isScrollable = target.scrollHeight > target.clientHeight;
 
         if (isScrollable) {
           const atTop = target.scrollTop === 0;
           const atBottom = target.scrollHeight - target.scrollTop === target.clientHeight;
-  
+
           if (atTop && e.deltaY < 0) {
             e.preventDefault(); // 상단에서 더 이상 스크롤되지 않도록 차단
           }
-  
+
           if (atBottom && e.deltaY > 0) {
             e.preventDefault(); // 하단에서 더 이상 스크롤되지 않도록 차단
           }
@@ -76,7 +95,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
           e.preventDefault();
         }
       }
-    }  
+    }
   };
 
   // 드롭다운이 열릴 때와 닫힐 때 스크롤 이벤트 제어
@@ -85,7 +104,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
       // 드롭다운이 보일 때 스크롤 방지
       document.addEventListener('wheel', preventScroll, { passive: false });
       document.addEventListener('touchmove', preventScroll, { passive: false });
-      
+
       adjustDropdownWidth(); // 드롭다운이 보일 때 스크롤바 여부에 따라 너비 조정
       document.body.style.overflow = 'hidden';
     } else {
@@ -95,7 +114,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
 
       document.body.style.overflow = '';
     }
-  
+
     // 컴포넌트가 언마운트될 때 스크롤 방지 해제
     return () => {
       document.removeEventListener('wheel', preventScroll);
@@ -132,23 +151,23 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
         />
         <div
           onClick={toggleDataDropdown}
-          style={{ 
+          style={{
             position: 'absolute',
             top: '1px',
             right: '1px',
-            border: 'none', 
-            width: '18px', 
+            border: 'none',
+            width: '18px',
             height: `${comboHeightProp - 4}px`,
-            color: '#ccc', 
+            color: '#ccc',
             backgroundColor: '#fff',
-            borderRadius: '0px 6px 6px 0px', 
+            borderRadius: '0px 6px 6px 0px',
           }}
         ><IoChevronDown size={16} style={{ paddingTop: '0px' }} /></div>
       </div>
 
       {/* 콤보버튼 클릭       */}
       {isDataDropdownVisible && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -159,11 +178,11 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
             zIndex: 1000
           }}
         >
-          {console.log("comboDataProp : ", comboDataProp)}
+          {/* {console.log("comboDataProp : ", comboDataProp)} */}
           <ul
             style={{
               position: 'absolute',
-              top: `${dropdownDataPosition.top}px`, 
+              top: `${dropdownDataPosition.top}px`,
               left: `${dropdownDataPosition.left}px`,
               width: `${dropdownWidth}px`, // 스크롤 여부에 따라 width 조정
               maxHeight: '180px',
@@ -173,7 +192,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
               zIndex: 1,
               padding: 0,
               listStyle: 'none',
-              borderRadius: '6px', 
+              borderRadius: '6px',
               margin: 0
             }}
             ref={dropdownDataRef}

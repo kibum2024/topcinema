@@ -29,4 +29,14 @@ public class MoviesController {
     public List<BestMovieProjection> getBestMovies() {
         return moviesService.getBestMovies();
     }
+
+    @PostMapping("/createmovies")
+    public Movies createMovies(@RequestBody Movies createdMovie) {
+        return moviesService.createMovies(createdMovie);
+    }
+
+    @PutMapping("/updatemovies/{id}")
+    public Movies updateMovies(@PathVariable int id, @RequestBody Movies updatedMovie) {
+        return moviesService.updateMovies(id, updatedMovie);
+    }
 }

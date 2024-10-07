@@ -77,7 +77,7 @@ const iconMap = {
 };
 
 // KbButton 컴포넌트
-const KbButton = ({ textProp, iconProp, onClick }) => {
+const KbButton = ({ textProp, iconProp, stateProp, onClick }) => {
   // 기본 버튼 스타일 설정
   const defaultButtonConfig = {
     width: ' fit-content',
@@ -99,14 +99,15 @@ const KbButton = ({ textProp, iconProp, onClick }) => {
   const buttonStyle = {
     ...defaultButtonConfig,  // 기본 설정
     border: iconConfig.border || defaultButtonConfig.border,
-    backgroundColor: isHovered ? (iconConfig.hover?.backgroundColor || defaultButtonConfig.backgroundColor) : defaultButtonConfig.backgroundColor,
-    color: isHovered ? (iconConfig.hover?.color || defaultButtonConfig.color) : defaultButtonConfig.color,
+    backgroundColor: stateProp ? (isHovered ? (iconConfig.hover?.backgroundColor || defaultButtonConfig.backgroundColor) : defaultButtonConfig.backgroundColor) : '#aaa',
+    color: stateProp ? (isHovered ? (iconConfig.hover?.color || defaultButtonConfig.color) : defaultButtonConfig.color) : 'white',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '0px 10px',
     userSelect: 'none',
-  };
+    pointerEvents: stateProp ? 'auto' : 'none',
+};
 
   return (
     <div>

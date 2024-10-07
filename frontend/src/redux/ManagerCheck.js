@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const ManagerCheck = createSlice({
   name: 'manager',
   initialState: {
-    isManagerVisible: false, 
+    isManagerVisible: true, 
   },
   reducers: {
     managerType: (state) => {

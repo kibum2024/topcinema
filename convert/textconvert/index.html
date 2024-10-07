@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>코드 생성기</title>
+    <style>
+        /* 탭 버튼 스타일 */
+        .tab {
+            display: inline-block;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        .tab.active {
+            background-color: white;
+            border-bottom: 1px solid white;
+        }
+
+        /* 탭 내용 스타일 */
+        .tab-content {
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: white;
+        }
+
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+        }
+    </style>
+    <script>
+        // 탭 클릭 시 해당 HTML 파일을 iframe에 불러오는 함수
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName("tab");
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+
+            document.getElementById(tabName + "-btn").classList.add("active");
+
+            // iframe을 사용해 외부 HTML 파일을 불러옴
+            document.getElementById("tab-content-frame").src = tabName + ".html";
+        }
+
+        // 페이지 로드 시 기본 탭을 로드
+        window.onload = function() {
+            openTab('react-usestate');
+        }
+    </script>
+</head>
+<body>
+    <h1>코드 생성기</h1>
+
+    <!-- 탭 버튼 -->
+    <div>
+        <div id="react-usestate-btn" class="tab active" onclick="openTab('react-usestate')">React useState 생성기</div>
+        <div id="spring-boot-btn" class="tab" onclick="openTab('spring-boot')">Spring Boot 코드 생성기</div>
+        <div id="json-mysql-btn" class="tab" onclick="openTab('json-mysql')">JSON to MySQL Insert 변환기</div>
+    </div>
+
+    <!-- 탭 내용이 로드될 iframe -->
+    <div class="tab-content">
+        <iframe id="tab-content-frame" src=""></iframe>
+    </div>
+
+</body>
+</html>

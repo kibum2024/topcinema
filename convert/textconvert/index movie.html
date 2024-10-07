@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Movie Info Extractor</title>
+</head>
+
+<body>
+  <h1>Movie Info Extractor</h1>
+  <input type="file"
+         id="fileInput"
+         accept=".txt, .html">
+  <button id="downloadJson">Download JSON</button>
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const htmlString = e.target.result;
+
+        // DOMParser를 이용해 HTML 문자열을 파싱
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, 'text/html');
+
+        // 모든 li 요소를 선택 (movie_list 클래스가 있는 ul 내부)
+        const liElements = doc.querySelectorAll('ul.movie_list > li');
+        const data = [];
+
+        liElements.forEach(li => {
+          // 영화 제목 추출
+          const movieTitle = li.querySelector('strong.tit_info') ? li.querySelector('strong.tit_info').textContent.trim() : '';
+
+          // <span class="poster_info"> 밑의 img 태그에서 이미지 파일명 추출
+          let imgSrc = li.querySelector('span.poster_info img') ? decodeURI(li.querySelector('span.poster_info img').src) : '';
+          let imgFilename = '';
+          if (imgSrc.endsWith('.jpg')) {
+            const lastSlashIndex = imgSrc.lastIndexOf('/');
+            imgFilename = imgSrc.substring(lastSlashIndex + 1);
+          }
+
+          // 영화 시간 추출: "105분" 형식으로 추출
+          const movieTimeElement = li.querySelector('span.time.blacktype');
+          const movieTime = movieTimeElement ? movieTimeElement.textContent.trim() : '';
+
+          // 추출된 데이터 저장
+          const dataItem = {
+            movie_title: movieTitle,
+            image_filename: imgFilename,
+            movie_time: movieTime
+          };
+
+          data.push(dataItem);
+        });
+
+        // JSON 형식으로 변환하여 출력
+        const jsonContent = JSON.stringify(data, null, 2);
+        const output = document.getElementById('output');
+        output.innerHTML = `<pre>${jsonContent}</pre>`;
+
+        // JSON 다운로드 버튼에 이벤트 추가
+        document.getElementById('downloadJson').addEventListener('click', function () {
+          const blob = new Blob([jsonContent], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'movies.json';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      };
+
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+
+</html>

@@ -2,27 +2,38 @@ import React, { useState, useEffect, useRef } from 'react';
 import KbCalendar from './KbCalendar';
 import { IoChevronDown, IoCalendarOutline } from "react-icons/io5";
 
-
-const KbInputDate = ({dateProp, onChange}) => {
-  const [selectedYear, setSelectedYear] = useState(dateProp.getFullYear()); 
-  const [selectedMonth, setSelectedMonth] = useState(String(dateProp.getMonth() + 1).padStart(2, '0')); 
-  const [selectedDate, setSelectedDate] = useState(String(dateProp.getDate()).padStart(2, '0')); 
-  const [isYearDropdownVisible, setIsYearDropdownVisible] = useState(false); 
-  const [isMonthDropdownVisible, setIsMonthDropdownVisible] = useState(false); 
+const KbInputDate = ({ dateProp, onChange }) => {
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [isYearDropdownVisible, setIsYearDropdownVisible] = useState(false);
+  const [isMonthDropdownVisible, setIsMonthDropdownVisible] = useState(false);
   const [dropdownYearPosition, setDropdownYearPosition] = useState({ top: 0, left: 0 });
   const [dropdownMonthPosition, setDropdownMonthPosition] = useState({ top: 0, left: 0 });
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
   const [isCalendarOpen, setIsCallendarOpen] = useState(false);
-  const dropdownYearRef = useRef(null); 
-  const dropdownMonthRef = useRef(null); 
-  const dropdownCalendarRef = useRef(null); 
-  const inputYearRef = useRef(null); 
-  const inputMonthRef = useRef(null); 
-  const inputDateRef = useRef(null); 
-  const CalendarRef = useRef(null); 
+  const dropdownYearRef = useRef(null);
+  const dropdownMonthRef = useRef(null);
+  const dropdownCalendarRef = useRef(null);
+  const inputYearRef = useRef(null);
+  const inputMonthRef = useRef(null);
+  const inputDateRef = useRef(null);
+  const CalendarRef = useRef(null);
   const years = Array.from({ length: 141 }, (_, i) => selectedYear - 100 + i);
-        years.sort((a, b) => b - a);
+  years.sort((a, b) => b - a);
   const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+
+  useEffect(() => {
+      let year = dateProp.slice(0, 4);
+      let month = dateProp.slice(4, 6);
+      let day = dateProp.slice(6, 8);
+      let formattedDate = new Date(year, month - 1, day);
+      setSelectedYear(formattedDate.getFullYear());
+      setSelectedMonth(String(formattedDate.getMonth() + 1).padStart(2, '0'));
+      setSelectedDate(String(formattedDate.getDate()).padStart(2, '0'));
+      onChange(selectedYear, selectedMonth, selectedDate);
+  }, [dateProp]);
+
 
   // 입력 필드 변경 시 처리
   const handleInputYearChange = (e) => {
@@ -145,7 +156,7 @@ const KbInputDate = ({dateProp, onChange}) => {
   const handleDateSelect = (date) => {
     setSelectedYear(date.getFullYear());
     setSelectedMonth(String(date.getMonth() + 1).padStart(2, '0'));
-    setSelectedDate(String(date.getDate()).padStart(2, '0')); 
+    setSelectedDate(String(date.getDate()).padStart(2, '0'));
     onChange(selectedYear, selectedMonth, selectedDate);
     setIsCallendarOpen(!isCalendarOpen);
   };
@@ -153,14 +164,14 @@ const KbInputDate = ({dateProp, onChange}) => {
   const preventScroll = (e) => {
     // 드롭다운들이 포함된 ref 배열
     const dropdownRefs = [dropdownYearRef, dropdownMonthRef, dropdownCalendarRef];
-  
+
     // 대상 중 하나라도 이벤트 타겟을 포함하는지 확인
     const isInAnyDropdown = dropdownRefs.some(ref => ref.current && ref.current.contains(e.target));
-  
+
     if (isInAnyDropdown) {
       const target = e.target;
       const isScrollable = target.scrollHeight > target.clientHeight;
-  
+
       if (isScrollable) {
         const atTop = target.scrollTop === 0;
         const atBottom = target.scrollHeight - target.scrollTop === target.clientHeight;
@@ -169,7 +180,7 @@ const KbInputDate = ({dateProp, onChange}) => {
         if (atTop && e.deltaY < 0) {
           e.preventDefault(); // 상단에서 더 이상 스크롤되지 않도록 차단
         }
-  
+
         // 스크롤이 하단에 도달했고, 사용자가 아래로 스크롤하려고 할 때
         if (atBottom && e.deltaY > 0) {
           e.preventDefault(); // 하단에서 더 이상 스크롤되지 않도록 차단
@@ -180,7 +191,7 @@ const KbInputDate = ({dateProp, onChange}) => {
       e.preventDefault();
     }
   };
-  
+
   useEffect(() => {
     // 어느 하나의 드롭다운이라도 열려 있으면 스크롤 차단
     if (isMonthDropdownVisible || isYearDropdownVisible || isCalendarOpen) {
@@ -191,12 +202,12 @@ const KbInputDate = ({dateProp, onChange}) => {
       document.removeEventListener('wheel', preventScroll);
       document.body.style.overflow = '';
     }
-  
+
     // 컴포넌트 언마운트 시에도 스크롤 방지를 해제
     return () => {
       document.removeEventListener('wheel', preventScroll);
     };
-  }, [isMonthDropdownVisible, isYearDropdownVisible, isCalendarOpen]); 
+  }, [isMonthDropdownVisible, isYearDropdownVisible, isCalendarOpen]);
 
   return (
     <div style={{ position: 'relative', display: 'flex', width: '200px', height: '25px' }}>
@@ -206,16 +217,18 @@ const KbInputDate = ({dateProp, onChange}) => {
         value={selectedYear}
         onChange={handleInputYearChange}
         maxLength={4}
-        style={{  padding: '5px', 
-                  width: '45px',                   
-                  textAlign: 'center',
-                  border: '1px solid #ccc', 
-                  fontSize: '14px' }}
+        style={{
+          padding: '5px',
+          width: '45px',
+          textAlign: 'center',
+          border: '1px solid #ccc',
+          fontSize: '14px'
+        }}
       />
       <div
         onClick={toggleYearDropdown}
         style={{ border: '1px solid #ccc', width: '18px', color: '#ccc', backgroundColor: '#fff', borderRadius: '4px' }}
-      ><IoChevronDown style={{ paddingTop: '0px', width: '16px', height: '16px', lineHeight: '16px' }}/></div>
+      ><IoChevronDown style={{ paddingTop: '0px', width: '16px', height: '16px', lineHeight: '16px' }} /></div>
       <div style={{ height: '25px', lineHeight: '25px' }}>&nbsp;/&nbsp;</div>
       <input
         ref={inputMonthRef}
@@ -226,16 +239,18 @@ const KbInputDate = ({dateProp, onChange}) => {
         min={1}
         max={12}
         maxLength={2}
-        style={{  padding: '5px', 
-                  width: '27px',                   
-                  textAlign: 'center',
-                  border: '1px solid #ccc', 
-                  fontSize: '14px' }}
+        style={{
+          padding: '5px',
+          width: '27px',
+          textAlign: 'center',
+          border: '1px solid #ccc',
+          fontSize: '14px'
+        }}
       />
       <div
         onClick={toggleMonthDropdown}
         style={{ border: '1px solid #ccc', width: '18px', color: '#ccc', backgroundColor: '#fff', borderRadius: '4px' }}
-      ><IoChevronDown style={{ paddingTop: '0px', width: '16px', height: '16px', lineHeight: '16px' }}/>
+      ><IoChevronDown style={{ paddingTop: '0px', width: '16px', height: '16px', lineHeight: '16px' }} />
       </div>
       <div style={{ height: '25px', lineHeight: '25px' }}>&nbsp;/&nbsp;</div>
       <input
@@ -247,21 +262,23 @@ const KbInputDate = ({dateProp, onChange}) => {
         min={1}
         max={31}
         maxLength={2}
-        style={{  padding: '5px', 
-                  width: '27px',                   
-                  textAlign: 'center',
-                  border: '1px solid #ccc', 
-                  fontSize: '14px' }}
+        style={{
+          padding: '5px',
+          width: '27px',
+          textAlign: 'center',
+          border: '1px solid #ccc',
+          fontSize: '14px'
+        }}
       />
       <button type="button"
-              ref={CalendarRef}
-              style={{ width: '25px', height: '25px', border: 'none', padding: '0px', backgroundColor: 'white'}}
-              onClick={handleCalendarClick}>
-              <IoCalendarOutline  style={{ width: '25px', height: '25px', color: 'rgb(0, 56, 121)', padding: '0px', cursor: 'pointer'}}/>
+        ref={CalendarRef}
+        style={{ width: '25px', height: '25px', border: 'none', padding: '0px', backgroundColor: 'white' }}
+        onClick={handleCalendarClick}>
+        <IoCalendarOutline style={{ width: '25px', height: '25px', color: 'rgb(0, 56, 121)', padding: '0px', cursor: 'pointer' }} />
       </button>
 
       {isCalendarOpen && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -272,10 +289,10 @@ const KbInputDate = ({dateProp, onChange}) => {
             zIndex: 1000
           }}
         >
-          <div 
+          <div
             style={{
               position: 'absolute',
-              top: `${calendarPosition.top}px`, 
+              top: `${calendarPosition.top}px`,
               left: `${calendarPosition.left}px`,
             }}
             ref={dropdownCalendarRef}
@@ -287,7 +304,7 @@ const KbInputDate = ({dateProp, onChange}) => {
 
       {/* 년도 드롭다운 메뉴 */}
       {isYearDropdownVisible && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -301,7 +318,7 @@ const KbInputDate = ({dateProp, onChange}) => {
           <ul
             style={{
               position: 'absolute',
-              top: `${dropdownYearPosition.top}px`, 
+              top: `${dropdownYearPosition.top}px`,
               left: `${dropdownYearPosition.left}px`,
               width: '68px',
               maxHeight: '180px',
@@ -320,7 +337,7 @@ const KbInputDate = ({dateProp, onChange}) => {
                 key={year}
                 onClick={() => handleSelectYearChange(year)}
                 style={{
-                  fontSize: '14px', 
+                  fontSize: '14px',
                   textAlign: 'center',
                   height: '18px',
                   cursor: 'pointer',
@@ -336,7 +353,7 @@ const KbInputDate = ({dateProp, onChange}) => {
 
       {/* 월 드롭다운 메뉴 */}
       {isMonthDropdownVisible && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             top: 0,
@@ -350,7 +367,7 @@ const KbInputDate = ({dateProp, onChange}) => {
           <ul
             style={{
               position: 'absolute',
-              top: `${dropdownMonthPosition.top}px`, 
+              top: `${dropdownMonthPosition.top}px`,
               left: `${dropdownMonthPosition.left}px`,
               width: '48px',
               maxHeight: '180px',
@@ -369,7 +386,7 @@ const KbInputDate = ({dateProp, onChange}) => {
                 key={month}
                 onClick={() => handleSelectMonthChange(month)}
                 style={{
-                  fontSize: '14px', 
+                  fontSize: '14px',
                   textAlign: 'center',
                   height: '18px',
                   cursor: 'pointer',

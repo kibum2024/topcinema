@@ -1,12 +1,13 @@
 .manager-movie-wrap {
   width: 100%;
+  height: 100%;
   display: flex;
   gap: 20px;
 }
 
 .manager-movie-left-panel {
   width: 50%;
-  height: 588px;
+  height: 97%;
   padding: 20px;
   margin: 20px 0px 20px 20px;
   border-radius: 6px;
@@ -21,7 +22,7 @@
 
 .manager-movie-right-panel {
   width: 50%;
-  height: 588px;
+  height: 97%;
   padding: 20px;
   margin: 20px 20px 20px 0px;
   border-radius: 6px;
@@ -52,6 +53,7 @@
   justify-content: flex-start;
   align-items: baseline;
   padding: 5px 0px;
+  margin-top: 30px;
 }
 
 .manager-movie-right-input-label {
@@ -75,14 +77,35 @@
 
 .manager-movie-right-input-line-img {
   display: flex;
-  width: 250px;
+  width: 350px;
   height: 170px;
 }
-.manager-movie-right-input-img {
+.manager-movie-right-input-img-view {
   width: 130px;
   height: 170px;
 }
 
+.manager-movie-right-input-img-input {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 130px;
+  height: 170px;
+  border-radius: 6px;
+  border: 1px solid rgb(236, 239, 243);
+  background-color: #ddd;
+}
+.manager-movie-right-input-img-input div {
+  width: 80px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+.manager-movie-right-input-img-file-input {
+  width: 250px;
+  height: 30px;
+  margin-top: 5px;
+}
 .manager-movie-right-input-textarea {
   width: 480px;
   height: 180px;

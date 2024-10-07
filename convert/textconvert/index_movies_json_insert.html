@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Movie Info Extractor and SQL Generator</title>
+</head>
+
+<body>
+  <h1>Movie Info Extractor and SQL Generator</h1>
+  <input type="file"
+         id="fileInput"
+         accept=".json">
+  <button id="downloadSQL">Download SQL</button>
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const jsonString = e.target.result;
+        const moviesData = JSON.parse(jsonString);
+
+        // SQL insert 문 생성
+        const insertStatements = [];
+
+        // movies 테이블에 대한 insert 문 생성
+        moviesData.forEach((movie, movieIndex) => {
+          const movieCode = movieIndex + 1; // movie_code는 1부터 시작
+          
+          const interestCount = movie.interest_count ? movie.interest_count : 0; // interest_count 값이 없으면 0으로 설정
+
+          const movieInsert = `INSERT INTO movies (movie_code, movie_name, movie_type, screening_time, age_restriction, view_count, screening_start_date, screening_end_date, interest_count, movie_story, movie_genre, nationality, director, movie_image_name, registration_date, user_code)
+VALUES (${movieCode}, '${movie.movie_name || ""}', '${movie.movie_type || ""}', '${movie.screening_time || ""}', '${movie.age_restriction || ""}', '${movie.viewCount || ""}', '${movie.screening_start_date || ""}', '${movie.screening_end_date || ""}', ${interestCount}, '${movie.movie_story || ""}', '${movie.movie_genre || ""}', '${movie.nationality || ""}', '${movie.director || ""}', '${movie.movie_image_name || ""}', '${movie.registration_date || ""}', NULL);`;
+          
+          insertStatements.push(movieInsert);
+
+          // movie_actors 테이블에 대한 insert 문 생성
+          const actors = movie.actors ? movie.actors.split(',').map(actor => actor.trim()) : [];
+          actors.forEach((actor, actorIndex) => {
+            const actorInsert = `INSERT INTO movie_actors (movie_code, actor_code, actor_name) VALUES (${movieCode}, ${actorIndex + 1}, '${actor}');`;
+            insertStatements.push(actorInsert);
+          });
+
+          // movie_trailers 테이블에 대한 insert 문 생성
+          if (movie.trailers) {
+            movie.trailers.forEach((trailer, trailerIndex) => {
+              const trailerInsert = `INSERT INTO movie_trailers (movie_code, trailer_code, trailer_name, trailer_image_name) VALUES (${movieCode}, ${trailerIndex + 1}, '${trailer.trailer_title}', '${trailer.trailer_image}');`;
+              insertStatements.push(trailerInsert);
+            });
+          }
+
+          // movie_still_cuts 테이블에 대한 insert 문 생성
+          if (movie.still_cuts) {
+            movie.still_cuts.forEach((stillCut, stillCutIndex) => {
+              const stillCutInsert = `INSERT INTO movie_still_cuts (movie_code, still_cut_code, still_cut_image_name) VALUES (${movieCode}, ${stillCutIndex + 1}, '${stillCut}');`;
+              insertStatements.push(stillCutInsert);
+            });
+          }
+        });
+
+        // SQL 출력
+        const output = document.getElementById('output');
+        output.innerHTML = `<pre>${insertStatements.join("\n\n")}</pre>`;
+
+        // SQL 다운로드 버튼에 이벤트 추가
+        document.getElementById('downloadSQL').addEventListener('click', function () {
+          const blob = new Blob([insertStatements.join("\n\n")], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'movies_insert.sql';
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      };
+
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+
+</html>

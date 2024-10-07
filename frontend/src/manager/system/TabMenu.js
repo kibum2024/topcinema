@@ -176,7 +176,8 @@ const TabMenu = forwardRef((props, ref) => {
         </div>
       </div>
 
-      <div style={{ height: '610px', overflow: 'hidden' }}>
+      {/* <div style={{ height: '610px', overflow: 'hidden' }}> */}
+      <div style={{ height: '97%', overflow: 'hidden' }}>
         {activeTab && componentMap[tabs.find((tab) => tab.title === activeTab)?.component]}
       </div>
     </div>
