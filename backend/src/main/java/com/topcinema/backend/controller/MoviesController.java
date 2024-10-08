@@ -39,11 +39,7 @@ public class MoviesController {
     }
 
     // 생성
-//    @PostMapping("/createmovies")
-//    public Movies createMovies(@RequestBody Movies movies) {
-//        return moviesService.createMovies(movies);
-//    }
-    @Value("${file.upload-dir}")
+    @Value("${file.upload-dir.movie}")
     private String uploadDir;
 
     @PostMapping("/createmovies")

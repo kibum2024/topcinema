@@ -25,7 +25,7 @@ public class FileUploadController {
     }
 
     // application.properties에서 설정된 파일 업로드 경로를 가져옴
-    @Value("${file.upload-dir}")
+    @Value("${file.upload-dir.movie}")
     private String uploadDir;
 
     @PostMapping("/upload")

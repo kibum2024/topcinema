@@ -75,6 +75,10 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
     }
   };
 
+  useEffect(() => {
+    setRowDatas(rowDataProp);
+  }, [rowDataProp]);
+
   const switchClick = (newState, rowIndex, field) => {
     handleInputChange(rowIndex, field, newState);
   };
@@ -317,7 +321,7 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
       });
 
       // 그리드 데이터를 업데이트
-      console.log("processedData : ", processedData);
+      // console.log("processedData : ", processedData);
       setRowDatas(processedData);
     };
 
@@ -375,25 +379,25 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
           }}
         >
           {excellProp === "1" ? (
-            <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} onClick={() => handleDownloadExcel()} />
+            <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleDownloadExcel()} />
           ) : (
             excellProp === "2" ? (
               <>
-                <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} onClick={() => handleDownloadExcel()} />
-                <Kbbutton textProp={"업로드"} iconProp={"엑셀"} onClick={() => handleButtonClick()} />
+                <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleDownloadExcel()} />
+                <Kbbutton textProp={"업로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleButtonClick()} />
               </>
             ) : (
               excellProp === "3" ? (
                 <>
-                  <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} onClick={() => handleDownloadExcel()} />
-                  <Kbbutton textProp={"양식받기"} iconProp={"엑셀"} onClick={() => handleDownloadExcelTemplate()} />
-                  <Kbbutton textProp={"업로드"} iconProp={"엑셀"} onClick={() => handleButtonClick()} />
+                  <Kbbutton textProp={"다운로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleDownloadExcel()} />
+                  <Kbbutton textProp={"양식받기"} iconProp={"엑셀"} stateProp={true} onClick={() => handleDownloadExcelTemplate()} />
+                  <Kbbutton textProp={"업로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleButtonClick()} />
                 </>
               ) : (
                 excellProp === "4" ? (
                   <>
-                    <Kbbutton textProp={"양식받기"} iconProp={"엑셀"} onClick={() => handleDownloadExcelTemplate()} />
-                    <Kbbutton textProp={"업로드"} iconProp={"엑셀"} onClick={() => handleButtonClick()} />
+                    <Kbbutton textProp={"양식받기"} iconProp={"엑셀"} stateProp={true} onClick={() => handleDownloadExcelTemplate()} />
+                    <Kbbutton textProp={"업로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleButtonClick()} />
                   </>
                 ) : (
                   <></>
@@ -421,41 +425,41 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
           }}
         >
           {curdProp === "1" ? (
-            <Kbbutton textProp={"등록"} iconProp={"추가"} onClick={() => buttonClick('추가')} />
+            <Kbbutton textProp={"등록"} iconProp={"추가"} stateProp={true} onClick={() => buttonClick('추가')} />
           ) : (
             curdProp === "2" ? (
               <>
-                <Kbbutton textProp={"수정"} iconProp={"수정"} onClick={() => buttonClick('수정')} />
+                <Kbbutton textProp={"수정"} iconProp={"수정"} stateProp={true} onClick={() => buttonClick('수정')} />
               </>
             ) : (
               curdProp === "3" ? (
                 <>
-                  <Kbbutton textProp={"삭제"} iconProp={"삭제"} onClick={() => buttonClick('삭제')} />
+                  <Kbbutton textProp={"삭제"} iconProp={"삭제"} stateProp={true} onClick={() => buttonClick('삭제')} />
                 </>
               ) : (
                 curdProp === "4" ? (
                   <>
-                    <Kbbutton textProp={"등록"} iconProp={"추가"} onClick={() => buttonClick('추가')} />
-                    <Kbbutton textProp={"수정"} iconProp={"수정"} onClick={() => buttonClick('수정')} />
+                    <Kbbutton textProp={"등록"} iconProp={"추가"} stateProp={true} onClick={() => buttonClick('추가')} />
+                    <Kbbutton textProp={"수정"} iconProp={"수정"} stateProp={true} onClick={() => buttonClick('수정')} />
                   </>
                 ) : (
                   curdProp === "5" ? (
                     <>
-                      <Kbbutton textProp={"등록"} iconProp={"추가"} onClick={() => buttonClick('추가')} />
-                      <Kbbutton textProp={"수정"} iconProp={"수정"} onClick={() => buttonClick('수정')} />
-                      <Kbbutton textProp={"삭제"} iconProp={"삭제"} onClick={() => buttonClick('삭제')} />
+                      <Kbbutton textProp={"등록"} iconProp={"추가"} stateProp={true} onClick={() => buttonClick('추가')} />
+                      <Kbbutton textProp={"수정"} iconProp={"수정"} stateProp={true} onClick={() => buttonClick('수정')} />
+                      <Kbbutton textProp={"삭제"} iconProp={"삭제"} stateProp={true} onClick={() => buttonClick('삭제')} />
                     </>
                   ) : (
                     curdProp === "6" ? (
                       <>
-                        <Kbbutton textProp={"등록"} iconProp={"추가"} onClick={() => buttonClick('추가')} />
-                        <Kbbutton textProp={"삭제"} iconProp={"삭제"} onClick={() => buttonClick('삭제')} />
+                        <Kbbutton textProp={"등록"} iconProp={"추가"} stateProp={true} onClick={() => buttonClick('추가')} />
+                        <Kbbutton textProp={"삭제"} iconProp={"삭제"} stateProp={true} onClick={() => buttonClick('삭제')} />
                       </>
                     ) : (
                       curdProp === "7" ? (
                         <>
-                          <Kbbutton textProp={"수정"} iconProp={"수정"} onClick={() => buttonClick('수정')} />
-                          <Kbbutton textProp={"삭제"} iconProp={"삭제"} onClick={() => buttonClick('삭제')} />
+                          <Kbbutton textProp={"수정"} iconProp={"수정"} stateProp={true} onClick={() => buttonClick('수정')} />
+                          <Kbbutton textProp={"삭제"} iconProp={"삭제"} stateProp={true} onClick={() => buttonClick('삭제')} />
                         </>
                       ) : (
                         <></>
@@ -498,7 +502,7 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
               borderRadius: config.borderRadius,
             }}
           />
-          <Kbbutton textProp={"조회"} iconProp={"검색"} onClick={() => inputSearch()} />
+          <Kbbutton textProp={"조회"} iconProp={"검색"} stateProp={true} onClick={() => inputSearch()} />
         </div>
       )}
       <div
@@ -553,7 +557,7 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
                 userSelect: 'none',
                 ...(columnDef.width ? { width: `${columnDef.width}px` } : { width: '150px' })
               }}
-              onClick={() => { columnSortClick(columnDef.field) }}
+              onClick={() => { columnDef.field && columnSortClick(columnDef.field) }}
             >
               {columnDef.checkboxSelection && columnDef.headerCheckboxSelection ? (
                 <div>
@@ -629,7 +633,6 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
                     </div>
                   ) : columnDef.switch ? (
                     <div style={{ pointerEvents: 'none' }}>
-                      {console.log("columnDef.editable : ", columnDef.editable)}
                       <KbSwitch swStatProp={rowData.use} />
                     </div>
                   ) : columnDef.searchButton ? (

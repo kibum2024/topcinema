@@ -12,10 +12,6 @@ const KbRadioButton = ({ itemProp, widthProp, itemDatasProp, selectedItemProp, o
       if (selectedItemProp) {
         const findIndex = itemDatasProp.findIndex(item => item.common_code === selectedItemProp);
 
-        console.log("itemDatasProp : ", itemDatasProp);
-        console.log("findIndex : ", findIndex);
-        console.log("selectedItemProp : ", selectedItemProp);
-
         if (findIndex !== -1) {
           setCurrentIndex(findIndex);
           // onClick(findIndex);

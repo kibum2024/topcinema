@@ -34,6 +34,14 @@ const KbInputDate = ({ dateProp, onChange }) => {
   // 입력 필드 변경 시 처리
   const handleInputYearChange = (e) => {
     setSelectedYear(e.target.value);
+  };
+
+  const handleInputYearBlur = (e) => {
+    if (e.target.value < 1950 || e.target.value > 2200) {
+      alert('년도는 1950과 2200 사이의 값을 입력하세요.');
+      setSelectedYear(dateProp.slice(0, 4));
+      inputYearRef.current.focus();
+    }
     onChange(selectedYear, selectedMonth, selectedDate);
   };
 
@@ -70,20 +78,20 @@ const KbInputDate = ({ dateProp, onChange }) => {
   // 여기서 부터 월 입력 필드 변경 시 처리
   const handleInputMonthChange = (e) => {
     setSelectedMonth(e.target.value);
-    onChange(selectedYear, selectedMonth, selectedDate);
   };
 
   const handleInputMonthBlur = (e) => {
     // 입력 값이 1자리 숫자면 2자리로 변환 (1 -> 01)
+    if (e.target.value < 1 || e.target.value > 12) {
+      alert('월은 01과 12 사이의 값을 입력하세요.');
+      setSelectedMonth("01");
+      inputMonthRef.current.focus();
+    }
+
     if (e.target.value.length === 1) {
       setSelectedMonth(`0${e.target.value}`);
     }
-
-    if (e.target.value < 1 || e.target.value > 12) {
-      alert('월은 01과 12 사이의 값을 입력하세요.');
-      setSelectedMonth(1);
-      inputMonthRef.current.focus();
-    }
+    onChange(selectedYear, selectedMonth, selectedDate);
   };
 
   // 드롭다운에서 연도 선택 시 처리
@@ -118,20 +126,20 @@ const KbInputDate = ({ dateProp, onChange }) => {
 
   const handleInputDateChange = (e) => {
     setSelectedDate(e.target.value);
-    onChange(selectedYear, selectedMonth, selectedDate);
   };
 
   const handleInputDateBlur = (e) => {
     // 입력 값이 1자리 숫자면 2자리로 변환 (1 -> 01)
+    if (e.target.value < 1 || e.target.value > 31) {
+      alert('월은 01과 31 사이의 값을 입력하세요.');
+      setSelectedDate("01");
+      inputDateRef.current.focus();
+    }
+    
     if (e.target.value.length === 1) {
       setSelectedDate(`0${e.target.value}`);
     }
-
-    if (e.target.value < 1 || e.target.value > 31) {
-      alert('월은 01과 31 사이의 값을 입력하세요.');
-      setSelectedDate(1);
-      inputDateRef.current.focus();
-    }
+    onChange(selectedYear, selectedMonth, selectedDate);
   };
 
   const handleCalendarClick = () => {
@@ -212,6 +220,7 @@ const KbInputDate = ({ dateProp, onChange }) => {
         type="text"
         value={selectedYear}
         onChange={handleInputYearChange}
+        onBlur={handleInputYearBlur}
         maxLength={4}
         style={{
           padding: '5px',

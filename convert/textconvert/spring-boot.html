@@ -67,10 +67,10 @@
             const repositoryCode = `package com.topcinema.backend.repository;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\n@Repository\npublic interface ${capitalize(tableName)}Repository extends JpaRepository<${capitalize(tableName)}, ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'Integer'}> {\n}\n`;
 
             // Service Class
-            const serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n}\n`;
+            const serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\nimport java.util.Optional;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n\n    public ${capitalize(tableName)} create${capitalize(tableName)}(${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Repository.save(${tableName.toLowerCase()});\n    }\n\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}, ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        Optional<${capitalize(tableName)}> existingEntity = ${tableName}Repository.findById(id);\n        if (existingEntity.isPresent()) {\n            ${tableName.toLowerCase()}.setMovie_code(id); // 정확한 컬럼명으로 설정\n            return ${tableName}Repository.save(${tableName.toLowerCase()});\n        }\n        return null;\n    }\n\n    public boolean delete${capitalize(tableName)}(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        Optional<${capitalize(tableName)}> ${tableName.toLowerCase()} = ${tableName}Repository.findById(id);\n        if (${tableName.toLowerCase()}.isPresent()) {\n            ${tableName}Repository.delete(${tableName.toLowerCase()}.get());\n            return true;\n        }\n        return false;\n    }\n}\n`;
 
             // Controller Class
-            const controllerCode = `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n}\n`;
+            const controllerCode = `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n\n    // 생성\n    @PostMapping("/createmovies")\n    public ${capitalize(tableName)} create${capitalize(tableName)}(@RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.create${capitalize(tableName)}(${tableName.toLowerCase()});\n    }\n\n    // ID로 수정\n    @PutMapping("/updatemovies/{id}")\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id, @RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.update${capitalize(tableName)}ById(id, ${tableName.toLowerCase()});\n    }\n\n    // 삭제\n    @DeleteMapping("/deletemovies/{id}")\n    public boolean delete${capitalize(tableName)}(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.delete${capitalize(tableName)}(id);\n    }\n}\n`;
 
             document.getElementById('model').value = modelCode;
             document.getElementById('repository').value = repositoryCode;
@@ -114,28 +114,26 @@
             return word.charAt(0).toUpperCase() + word.slice(1);
         }
 
-        // 수정된 타입 변환 함수
         function convertType(sqlType) {
-            // sqlType을 소문자로 변환하여 비교
             switch (sqlType.toLowerCase()) {
                 case 'int':
                 case 'int,':
-                case 'integer':    // SQL에서는 int와 integer는 같은 타입으로 간주
-                    return 'Integer';  // int나 integer 타입을 Java의 Integer로 변환
+                case 'integer':
+                    return 'Integer';
                 case 'char(1)':
-                    return 'char';  // 단일 문자(char)
+                    return 'char';
                 case 'varchar(100)':
                 case 'varchar(20)':
                 case 'varchar(2000)':
                 case 'varchar(200)':
                 case 'varchar':
-                    return 'String';  // varchar 타입을 String으로 변환
+                    return 'String';
                 case 'char(4)':
                 case 'char(8)':
                 case 'char':
-                    return 'String';  // 길이에 상관없이 char 타입을 String으로 변환
+                    return 'String';
                 default:
-                    return 'String';  // 기본값은 String으로 설정
+                    return 'String';
             }
         }
     </script>

@@ -148,6 +148,7 @@ const KbComboInButton = ({ comboDataProp, userProp, comboWidthProp, comboHeightP
             border: '1px solid #ccc',
             paddingLeft: '10px',
           }}
+          disabled
         />
         <div
           onClick={toggleDataDropdown}

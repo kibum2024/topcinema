@@ -1,0 +1,87 @@
+.manager-cinema-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  gap: 20px;
+}
+
+.manager-cinema-left-panel {
+  width: 50%;
+  height: 97%;
+  padding: 20px;
+  margin: 20px 0px 20px 20px;
+  border-radius: 6px;
+  border: 1px solid rgb(236, 239, 243);
+}
+
+.manager-cinema-left-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(0, 56, 121);
+}
+
+.manager-cinema-right-panel {
+  width: 50%;
+  height: 97%;
+  padding: 20px;
+  margin: 20px 20px 20px 0px;
+  border-radius: 6px;
+  border: 1px solid rgb(236, 239, 243);
+}
+
+.manager-cinema-right-header {
+  margin-bottom: 20px;
+}
+.manager-cinema-right-button {
+  display: flex;
+  justify-content: end;
+  gap: 5px;
+}
+.input_movie_code {
+  text-align: right;
+}
+
+.manager-cinema-right-input-line {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 5px 0px;
+}
+
+.manager-cinema-right-input-line.area {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  padding: 5px 0px;
+}
+
+.manager-cinema-right-input-label {
+  width: 100px;
+  text-align: right;
+  padding-right: 5px;
+}
+.manager-cinema-right-input-button {
+  margin-left: 5px;
+}
+
+.manager-cinema-right-input-col {
+  display: flex;
+  justify-content: start;
+  /* width: 30%; */
+}
+
+.manager-cinema-right-input-line-group-flex {
+  display: flex;
+}
+
+.manager-cinema-right-input-line-group {
+  width: 50%;
+}
+
+.manager-cinema-right-input-textarea {
+  width: 480px;
+  height: 180px;
+  resize: none; 
+  overflow-y: auto;
+  
+}

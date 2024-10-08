@@ -2,6 +2,7 @@ import React, { useState, forwardRef, useImperativeHandle, useRef, useEffect } f
 import { IoClose, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import KbButton from 'components/KbButton';
 import ManagerMovie from 'manager/movie/ManagerMovie';
+import ManagerCinema from 'manager/cinema/ManagerCinema';
 
 // 로컬 스토리지에 저장하는 함수
 const saveToLocalStorage = (key, value) => {
@@ -20,6 +21,7 @@ const TabMenu = forwardRef((props, ref) => {
   const [activeTab, setActiveTab] = useState(loadFromLocalStorage('activeTab', '메인'));
   const [tabStates, setTabStates] = useState(loadFromLocalStorage('tabStates', {
     ManagerMovie: {},
+    ManagerCinema: {},
     Form2: {},
     Form3: {},
     UserManagement: {},
@@ -31,6 +33,7 @@ const TabMenu = forwardRef((props, ref) => {
 
   const componentMap = {
     ManagerMovie: <ManagerMovie formData={tabStates['Form3']} setFormData={(data) => updateTabState('ManagerMovie', data)} />,
+    ManagerCinema: <ManagerCinema formData={tabStates['Form3']} setFormData={(data) => updateTabState('ManagerCinema', data)} />,
     // UserManagement: <UserManagement formData={tabStates['UserManagement']} setFormData={(data) => updateTabState('UserManagement', data)} />,
     // ClientInformation: <ClientInformation formData={tabStates['ClientInformation']} setFormData={(data) => updateTabState('ClientInformation', data)} />,
   };
@@ -172,7 +175,7 @@ const TabMenu = forwardRef((props, ref) => {
           ))}
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '42px', right: '5px' }}>
-          <KbButton textProp={'모두닫기'} iconProp={"닫기"} onClick={removeAllTabs} />
+          <KbButton textProp={'모두닫기'} iconProp={"닫기"} stateProp={true} onClick={removeAllTabs} />
         </div>
       </div>
 
