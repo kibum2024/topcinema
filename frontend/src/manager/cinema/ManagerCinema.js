@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import KbButton from 'components/KbButton';
 import KbGrid from 'components/KbGrid';
-import KbComboInButton from 'components/KbComboInButton';
-import KbRadioButton from 'components/KbRadioButton';
-import KbInputDate from 'components/KbInputDate';
 import 'manager/cinema/ManagerCinema.css';
 
 const ManagerCinema = () => {
+  const isUserCode = useSelector((state) => state.userState.userCode);
   const [cinemas, setCinemas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [changDataCheck, setChangDataCheck] = useState(true);
@@ -15,9 +14,9 @@ const ManagerCinema = () => {
   const [updateButtonState, setUpdateButtonState] = useState(true);
   const [deleteButtonState, setDeleteButtonState] = useState(true);
 
-  const [theaterCode, setTheaterCode] = useState("");
-  const [theaterName, setTheaterName] = useState("");
-  const [roadCode, setRoadCode] = useState("");
+  const [cinemaCode, setCinemaCode] = useState("");
+  const [cinemaName, setCinemaName] = useState("");
+  const [postCode, setPostCode] = useState("");
   const [address, setAddress] = useState("");
   const [detailAddress, setDetailAddress] = useState("");
   const [publicTransportInfo, setPublicTransportInfo] = useState("");
@@ -25,41 +24,38 @@ const ManagerCinema = () => {
   const [longitude, setLongitude] = useState("");
   const [latitude, setLatitude] = useState("");
   const [regionCode, setRegionCode] = useState("");
-  const [registrationDate, setRegistrationDate] = useState("");
   const [userCode, setUserCode] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
+    
 
   const [columnDefs] = useState([
     { headerName: '선택', checkboxSelection: true, width: 50, align: 'center', search: false },
-    { headerName: '코드', field: 'movie_code', width: 100, align: 'center', chartype: 'number' },
-    { headerName: '영화관명', field: 'movie_name', width: 320, align: 'left', chartype: 'string', search: true },
-    { headerName: '등록일', field: 'registration_date', width: 200, align: 'center', chartype: 'date' },
+    { headerName: '코드', field: 'cinema_code', width: 50, align: 'center', chartype: 'number' },
+    { headerName: '영화관명', field: 'cinema_name', width: 320, align: 'left', chartype: 'string', search: true },
+    { headerName: '등록일', field: 'created_at', width: 200, align: 'center', chartype: 'timestamp' },
   ]);
 
   const handleInitClick = () => {
-    // setMovieCode("");
-    // setMovieName("");
-    // setMovieType("1");
-    // setScreeningTime("");
-    // setAgeRestriction("1");
-    // setViewCount(0);
-    // setScreeningStartDate(nowDate);
-    // setScreeningEndDate(nowDate);
-    // setInterestCount(0);
-    // setMovieStory("");
-    // setMovieGenre("");
-    // setNationality("");
-    // setDirector("");
-    // setMovieImageName("");
-    // setRegistrationDate(nowDate);
-    // setUserCode("");
-    // setImagePreview(null);
-    // document.getElementById('fileInput').value = '';
+    setCinemaCode("");
+    setCinemaName("");
+    setPostCode("");
+    setAddress("");
+    setDetailAddress("");
+    setPublicTransportInfo("");
+    setParkingInfo("");
+    setLongitude("");
+    setLatitude("");
+    setRegionCode("");
+    setUserCode(isUserCode);
+    setCreatedAt("");
+    setUpdatedAt("");
   };
 
   useEffect(() => {
     const fetchCinemas = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/movies`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/cinemas`);
         if (response.data && response.data.length > 0) {
           setCinemas(response.data);
           handleInitClick();
@@ -92,7 +88,7 @@ const ManagerCinema = () => {
 
   //신규, 수정, 삭제 상태에 따라 버튼 활성화
   useEffect(() => {
-    if (theaterCode === "") {
+    if (cinemaCode === "") {
       setInsertButtonState(true);
       setUpdateButtonState(false);
       setDeleteButtonState(false);
@@ -101,7 +97,7 @@ const ManagerCinema = () => {
       setUpdateButtonState(true);
       setDeleteButtonState(true);
     }
-  }, [theaterCode]);
+  }, [cinemaCode]);
 
   if (loading) {
     // 로딩 중일 때 표시할 내용
@@ -115,7 +111,18 @@ const ManagerCinema = () => {
     }
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/createmovies`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/createcinemas`, {
+        cinema_code: cinemaCode,
+        cinema_name: cinemaName,
+        post_code: postCode,
+        address: address,
+        detail_address: detailAddress,
+        public_transport_info: publicTransportInfo,
+        parking_info: parkingInfo,
+        longitude: longitude,
+        latitude: latitude,
+        region_code: regionCode,
+        user_code: userCode,
       });
       alert('자료가 저장되었습니다.');
       setChangDataCheck(!changDataCheck);
@@ -130,22 +137,17 @@ const ManagerCinema = () => {
     }
 
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/updatemovies/${theaterCode}`, {
-        // movie_name: movieName,
-        // movie_type: movieType,
-        // screening_time: screeningTime,
-        // age_restriction: ageRestriction,
-        // view_count: viewCount,
-        // screening_start_date: screeningStartDate,
-        // screening_end_date: screeningEndDate,
-        // interest_count: interestCount,
-        // movie_story: movieStory,
-        // movie_genre: movieGenre,
-        // nationality: nationality,
-        // director: director,
-        // movie_image_name: movieImageName,
-        // registration_date: registrationDate,
-        // user_code: userCode,
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/updatecinemas/${cinemaCode}`, {
+        cinema_name: cinemaName,
+        post_code: postCode,
+        address: address,
+        detail_address: detailAddress,
+        public_transport_info: publicTransportInfo,
+        parking_info: parkingInfo,
+        longitude: longitude,
+        latitude: latitude,
+        region_code: regionCode,
+        user_code: userCode,
       });
       alert("자료가 수정되었습니다.");
       setChangDataCheck(!changDataCheck);
@@ -159,7 +161,7 @@ const ManagerCinema = () => {
 
     if (userConfirmed) {
       try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/deletemovies/${theaterCode}`);
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/deletecinemas/${cinemaCode}`);
         alert("선택한자료가 삭제되었습니다.");
         setChangDataCheck(!changDataCheck);
       } catch (error) {
@@ -168,67 +170,58 @@ const ManagerCinema = () => {
     };
   };
 
-  const validateCheck = () => {
-    // if (!movieName || movieName.trim() === '') {
-    //   alert('영화 이름을 입력해주세요.');
-    //   return false;
-    // }
-    // if (!movieType || movieType.trim() === '') {
-    //   alert('영화 유형을 입력해주세요.');
-    //   return false;
-    // }
-    // if (!screeningTime || screeningTime.trim() === '') {
-    //   alert('상영 시간을 올바르게 입력해주세요.');
-    //   return false;
-    // }
-    // if (!ageRestriction || ageRestriction.trim() === '') {
-    //   alert('나이 제한을 숫자로 입력해주세요.');
-    //   return false;
-    // }
-    // if (!screeningStartDate) {
-    //   alert('상영 시작 날짜를 선택해주세요.');
-    //   return false;
-    // }
-    // if (!screeningEndDate) {
-    //   alert('상영 종료 날짜를 선택해주세요.');
-    //   return false;
-    // }
-    // if (!movieGenre || movieGenre.trim() === '') {
-    //   alert('영화 장르를 입력해주세요.');
-    //   return false;
-    // }
-    // if (!director || director.trim() === '') {
-    //   alert('감독 이름을 입력해주세요.');
-    //   return false;
-    // }
-    // if (!movieImageName) {
-    //   alert('이미지 파일을 선택해주세요.');
-    //   return false;
-    // }
-
-    return true; // 모든 유효성 검사를 통과한 경우
+  const handleCinemaCodeClick = (cinemaCode) => {
+    const findCinema = cinemas.find(cinema => cinema.cinema_code === cinemaCode);
+    if (findCinema) {
+      setCinemaCode(findCinema.cinema_code);
+      setCinemaName(findCinema.cinema_name);
+      setPostCode(findCinema.post_code);
+      setAddress(findCinema.address);
+      setDetailAddress(findCinema.detail_address);
+      setPublicTransportInfo(findCinema.public_transport_info);
+      setParkingInfo(findCinema.parking_info);
+      setLongitude(findCinema.longitude);
+      setLatitude(findCinema.latitude);
+      setRegionCode(findCinema.region_code);
+      setCreatedAt(findCinema.created_at);
+      setUpdatedAt(findCinema.updated_at);
+    }
   };
 
-  const handleCinemaCodeClick = (theaterCode) => {
-    // const findMovie = movies.find(movie => movie.movie_code === movieCode);
-    // if (findMovie) {
-    //   setMovieCode(findMovie.movie_code);
-    //   setMovieName(findMovie.movie_name);
-    //   setMovieType(findMovie.movie_type);
-    //   setScreeningTime(findMovie.screening_time);
-    //   setAgeRestriction(findMovie.age_restriction);
-    //   setViewCount(findMovie.view_count);
-    //   setScreeningStartDate(findMovie.screening_start_date);
-    //   setScreeningEndDate(findMovie.screening_end_date);
-    //   setInterestCount(findMovie.interest_count);
-    //   setMovieStory(findMovie.movie_story);
-    //   setMovieGenre(findMovie.movie_genre);
-    //   setNationality(findMovie.nationality);
-    //   setDirector(findMovie.director);
-    //   setMovieImageName(findMovie.movie_image_name);
-    //   setRegistrationDate(findMovie.registration_date);
-    //   setUserCode(findMovie.user_code);
-    // }
+  const validateCheck = () => {
+    if (!cinemaName || cinemaName.trim() === '') {
+      alert('Cinema name을(를) 입력해주세요.');
+      return false;
+    }
+    if (!postCode || postCode.trim() === '') {
+      alert('Post code을(를) 입력해주세요.');
+      return false;
+    }
+    if (!address || address.trim() === '') {
+      alert('Address을(를) 입력해주세요.');
+      return false;
+    }
+    if (!detailAddress || detailAddress.trim() === '') {
+      alert('Detail address을(를) 입력해주세요.');
+      return false;
+    }
+    if (!publicTransportInfo || publicTransportInfo.trim() === '') {
+      alert('Public transport_info을(를) 입력해주세요.');
+      return false;
+    }
+    if (!parkingInfo || parkingInfo.trim() === '') {
+      alert('Parking info을(를) 입력해주세요.');
+      return false;
+    }
+    if (!longitude || longitude.trim() === '') {
+      alert('Longitude을(를) 입력해주세요.');
+      return false;
+    }
+    if (!latitude || latitude.trim() === '') {
+      alert('Latitude을(를) 입력해주세요.');
+      return false;
+    }
+    return true;
   };
 
   const handleAddressClick = () => {
@@ -240,7 +233,8 @@ const ManagerCinema = () => {
     new window.daum.Postcode({
       oncomplete: function (data) {
         let fullAddress = data.address; // 선택된 주소
-        let roadAddressCode = data.roadAddressCode; // 도로명 주소 코드
+        // let roadAddressCode = data.roadAddressCode; // 도로명 주소 코드
+        let postcode = data.zonecode;
         let extraAddress = '';
 
         if (data.addressType === 'R') {
@@ -253,8 +247,8 @@ const ManagerCinema = () => {
           fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
         }
 
-        setAddress(fullAddress);  // 검색된 주소를 상태에 저장
-        setRoadCode(roadAddressCode); // 도로코드를 상태에 저장
+        setAddress(fullAddress); 
+        setPostCode(postcode);
       },
       width: width,
       height: height
@@ -279,7 +273,7 @@ const ManagerCinema = () => {
               paginationProp={true} // 페이징 활성화
               paginationPageSizeProp={15} // 페이지당 10개 행 표시
               searchProp={true}
-              keyProp={"theater_code"}
+              keyProp={"cinema_code"}
               onClick={handleCinemaCodeClick}
             />
           )}
@@ -297,36 +291,32 @@ const ManagerCinema = () => {
         <div className='manager-cinema-right-input'>
           <div className="manager-cinema-right-input-line">
             <label htmlFor="" className="manager-cinema-right-input-label">영화관코드</label>
-            <input className="width100 input_movie_code" type="text" disabled value={theaterCode} />
+            <input className="width100 input_movie_code" type="text" disabled value={cinemaCode} />
           </div>
           <div className="manager-cinema-right-input-line">
             <label htmlFor="" className="manager-cinema-right-input-label">영화관명<span className='compulsory-item'>*</span></label>
-            <input className="width400" type="text" maxlength="50" value={theaterName} onChange={(e) => { setTheaterName(e.target.value) }} />
+            <input className="width400" type="text" maxlength="50" value={cinemaName} onChange={(e) => { setCinemaName(e.target.value) }} />
           </div>
           <div className="manager-cinema-right-input-line">
             <label htmlFor="" className="manager-cinema-right-input-label">주소<span className='compulsory-item'>*</span></label>
-            <input className="width50" type="text" maxlength="4" disabled value={roadCode} onChange={(e) => { setRoadCode(e.target.value) }} />
+            <input className="width50" type="text" maxlength="5" disabled value={postCode} />
             <div className="manager-cinema-right-input-button">
               <KbButton textProp={"검색"} iconProp={"검색"} stateProp={true} onClick={() => handleAddressClick('검색')} />
             </div>
           </div>
           <div className="manager-cinema-right-input-line">
             <label htmlFor="" className="manager-cinema-right-input-label">기본주소<span className='compulsory-item'>*</span></label>
-            <input className="width400" type="text" maxlength="4" value={address} onChange={(e) => { setAddress(e.target.value) }} />
+            <input className="width400" type="text" maxlength="100" disabled value={address} />
           </div>
           <div className="manager-cinema-right-input-line">
             <label htmlFor="" className="manager-cinema-right-input-label">상세주소<span className='compulsory-item'>*</span></label>
-            <input className="width400" type="text" maxlength="4" value={detailAddress} onChange={(e) => { setDetailAddress(e.target.value) }} />
+            <input className="width400" type="text" maxlength="100" value={detailAddress} onChange={(e) => { setDetailAddress(e.target.value) }} />
           </div>
           <div className="manager-cinema-right-input-line">
-            <div className="manager-movie-right-input-col">
-              <label htmlFor="" className="manager-cinema-right-input-label">경도<span className='compulsory-item'>*</span></label>
-              <input className="width150" type="text" maxlength="4" value={longitude} onChange={(e) => { setLongitude(e.target.value) }} />
-            </div>
-            <div className="manager-movie-right-input-col">
-              <label htmlFor="" className="manager-cinema-right-input-label">위도<span className='compulsory-item'>*</span></label>
-              <input className="width150" type="text" maxlength="4" value={latitude} onChange={(e) => { setLatitude(e.target.value) }} />
-            </div>
+            <label htmlFor="" className="manager-cinema-right-input-label">경도<span className='compulsory-item'>*</span></label>
+            <input className="width150" type="text" maxlength="10" value={longitude} onChange={(e) => { setLongitude(e.target.value) }} />
+            <label htmlFor="" className="manager-cinema-right-input-label">위도<span className='compulsory-item'>*</span></label>
+            <input className="width150" type="text" maxlength="10" value={latitude} onChange={(e) => { setLatitude(e.target.value) }} />
           </div>
           <div className="manager-cinema-right-input-line area">
             <label htmlFor="" className="manager-cinema-right-input-label">대중교통안내<span className='compulsory-item'>*</span></label>

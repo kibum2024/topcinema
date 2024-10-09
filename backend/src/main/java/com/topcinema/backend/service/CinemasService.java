@@ -29,7 +29,7 @@ public class CinemasService {
     public Cinemas updateCinemasById(int id, Cinemas cinemas) {
         Optional<Cinemas> existingEntity = cinemasRepository.findById(id);
         if (existingEntity.isPresent()) {
-            cinemas.setTheater_code(id); // 정확한 컬럼명으로 설정
+            cinemas.setCinemaCode(id);
             return cinemasRepository.save(cinemas);
         }
         return null;

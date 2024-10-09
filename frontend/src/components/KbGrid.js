@@ -75,6 +75,21 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
     }
   };
 
+  function formatTimestamp(timestamp) {
+    if (!timestamp) {
+      return ""; 
+    }
+    const date = new Date(timestamp);
+
+    const year = date.getFullYear();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 0부터 시작하므로 +1
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${day}-${month} ${hours}:${minutes}`;
+}
+
   useEffect(() => {
     setRowDatas(rowDataProp);
   }, [rowDataProp]);
@@ -359,7 +374,7 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
   };
 
   return (
-    <div>
+    <div className='kb-grid-wrap'>
       <div
         style={{
           display: 'flex',
@@ -673,8 +688,9 @@ const KbGrid = ({ columnDefsProp, rowDataProp, rowSelectionProp, paginationProp,
                   ) : columnDef.numbering ? (
                     <div>{formatNumber(actualIndex + 1)}</div>
                   ) : columnDef.chartype === 'date' ? (
-                    // <div>{rowData[columnDef.field]}</div>
                     <div>{formatDate(rowData[columnDef.field])}</div>
+                  ) : columnDef.chartype === 'timestamp' ? (
+                    <div>{formatTimestamp(rowData[columnDef.field])}</div>
                   ) : columnDef.separator ? (
                     <div>{formatNumber(rowData[columnDef.field])}</div>
                   ) : (

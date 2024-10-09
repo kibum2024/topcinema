@@ -1,11 +1,11 @@
-.manager-cinema-wrap {
+.manager-theater-wrap {
   width: 100%;
   height: 100%;
   display: flex;
   gap: 20px;
 }
 
-.manager-cinema-left-panel {
+.manager-theater-left-panel {
   width: 50%;
   height: 96%;
   padding: 20px;
@@ -14,17 +14,17 @@
   border: 1px solid rgb(236, 239, 243);
 }
 
-.manager-cinema-left-title {
+.manager-theater-left-title {
   font-size: 16px;
   font-weight: bold;
   color: rgb(0, 56, 121);
 }
 
-.manager-cinema-left-grid {
+.manager-theater-left-grid {
   width: 100%;
 }
 
-.manager-cinema-right-panel {
+.manager-theater-right-panel {
   width: 50%;
   height: 96%;
   padding: 20px;
@@ -33,10 +33,10 @@
   border: 1px solid rgb(236, 239, 243);
 }
 
-.manager-cinema-right-header {
+.manager-theater-right-header {
   margin-bottom: 20px;
 }
-.manager-cinema-right-button {
+.manager-theater-right-button {
   display: flex;
   justify-content: end;
   gap: 5px;
@@ -45,38 +45,38 @@
   text-align: right;
 }
 
-.manager-cinema-right-input-line {
+.manager-theater-right-input-line {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   padding: 5px 0px;
 }
 
-.manager-cinema-right-input-line.area {
+.manager-theater-right-input-line.area {
   display: flex;
   justify-content: flex-start;
   align-items: baseline;
   padding: 5px 0px;
 }
 
-.manager-cinema-right-input-label {
+.manager-theater-right-input-label {
   width: 100px;
   text-align: right;
   padding-right: 5px;
 }
-.manager-cinema-right-input-button {
+.manager-theater-right-input-button {
   margin-left: 5px;
 }
 
-.manager-cinema-right-input-line-group-flex {
+.manager-theater-right-input-line-group-flex {
   display: flex;
 }
 
-.manager-cinema-right-input-line-group {
+.manager-theater-right-input-line-group {
   width: 50%;
 }
 
-.manager-cinema-right-input-textarea {
+.manager-theater-right-input-textarea {
   width: 400px;
   height: 140px;
   resize: none; 

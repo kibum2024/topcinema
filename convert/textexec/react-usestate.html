@@ -6,28 +6,90 @@
     <title>React useState 코드 생성기</title>
     <script>
         function generateUseStateHooks() {
-            const tableStructure = document.getElementById('tableStructure').value;
+            const tableStructure = document.getElementById('tableStructure').value.trim();
             const fields = extractFields(tableStructure);
+            const tableName = extractTableName(tableStructure);  // 테이블명 추출
 
-            let result = '';
+            let useStateCode = '';
+            let initHandlerCode = 'const handleInitClick = () => {\n';
+            let setFindEntityCode = `const handle${capitalize(tableName.slice(0, -1))}CodeClick = (${tableName.slice(0, -1)}Code) => {\n`;
+            setFindEntityCode += `  const find${capitalize(tableName.slice(0, -1))} = ${tableName}.find(${tableName.slice(0, -1)} => ${tableName.slice(0, -1)}.${tableName.slice(0, -1)}_code === ${tableName.slice(0, -1)}Code);\n`;
+            setFindEntityCode += `  if (find${capitalize(tableName.slice(0, -1))}) {\n`;
+            let objectMappingCode = '';
+            let validationCode = 'const validateCheck = () => {\n';
+            let hasValidation = false;  // 유효성 검사 코드가 추가되었는지 확인
+            
             fields.forEach(field => {
                 const stateName = toCamelCase(field.name);
-                result += `const [${stateName}, set${capitalize(stateName)}] = useState("");\n`;
+                const capitalizedStateName = capitalize(stateName);
+
+                // useState 코드 생성
+                useStateCode += `const [${stateName}, set${capitalizedStateName}] = useState("");\n`;
+
+                // 초기화 핸들러 코드
+                initHandlerCode += `  set${capitalizedStateName}("");\n`;
+
+                // setFindEntity 코드
+                setFindEntityCode += `    set${capitalizedStateName}(find${capitalize(tableName.slice(0, -1))}.${convertToCamelCase(field.name)});\n`;
+
+                // 객체 매핑 코드
+                objectMappingCode += `  ${field.name}: ${stateName},\n`;
+
+                // 유효성 검사 코드 생성 (VARCHAR, CHAR, TEXT 타입에 대해서만 유효성 검사)
+                if (field.type.includes('VARCHAR') || field.type.includes('CHAR') || field.type.includes('TEXT')) {
+                    hasValidation = true;
+                    validationCode += `  if (!${stateName} || ${stateName}.trim() === '') {\n`;
+                    validationCode += `    alert('${capitalize(field.name.replace('_', ' '))}을(를) 입력해주세요.');\n`;
+                    validationCode += `    return false;\n  }\n`;
+                }
             });
 
-            document.getElementById('generatedCode').value = result;
+            initHandlerCode += '};';  // 초기화 핸들러 코드 끝
+
+            setFindEntityCode += '  }\n};';  // handleClick 코드 끝
+
+            if (!hasValidation) {
+                validationCode += '  return true; // 모든 유효성 검사를 통과한 경우\n};';  // 유효성 검사 코드가 없는 경우
+            } else {
+                validationCode += '  return true;\n};';  // 유효성 검사가 있는 경우 끝
+            }
+
+            // 생성된 코드를 각각의 텍스트 영역에 출력
+            document.getElementById('useStateCode').value = useStateCode;
+            document.getElementById('initHandlerCode').value = initHandlerCode;
+            document.getElementById('setFindEntityCode').value = setFindEntityCode;
+            document.getElementById('objectMappingCode').value = objectMappingCode;
+            document.getElementById('validationCode').value = validationCode;
         }
 
+        // 테이블명 추출 함수
+        function extractTableName(structure) {
+            const match = structure.match(/CREATE TABLE (\w+)/);
+            return match ? match[1] : 'Entity';
+        }
+
+        // 필드에서 CREATE, PRIMARY 등의 키워드를 제외하고 필드 추출
         function extractFields(structure) {
-            const fieldLines = structure.split('\n').filter(line => line.trim().match(/^\s*\w+.*$/));
-            return fieldLines.map(line => {
-                const [name] = line.trim().split(/\s+/);
-                return { name: name.replace(',', '') };
+            const ignoredKeywords = ['CREATE', 'PRIMARY', 'KEY', 'FOREIGN', 'AUTO_INCREMENT'];  // 제외할 키워드
+            const fieldLines = structure.split('\n').filter(line => {
+                const name = line.trim().split(/\s+/)[0];
+                return name && !ignoredKeywords.includes(name.toUpperCase());
             });
+
+            return fieldLines.map(line => {
+                const parts = line.trim().split(/\s+/);  // line을 나누어 처리
+                if (parts.length < 2) return null; // 필드명과 타입이 없는 경우 무시
+                const [name, type] = parts;
+                return { name: name.replace(',', ''), type: type ? type.toUpperCase() : '' };
+            }).filter(field => field !== null);  // null 값이 들어가지 않도록 필터링
         }
 
         function toCamelCase(str) {
             return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+        }
+
+        function convertToCamelCase(fieldName) {
+            return fieldName.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
         }
 
         function capitalize(str) {
@@ -41,6 +103,14 @@
             link.download = filename;
             link.click();
         }
+
+        function saveAll() {
+            saveTextAsFile(document.getElementById('useStateCode').value, 'useStateCode.js');
+            saveTextAsFile(document.getElementById('initHandlerCode').value, 'initHandlerCode.js');
+            saveTextAsFile(document.getElementById('setFindEntityCode').value, 'handleClickCode.js');
+            saveTextAsFile(document.getElementById('objectMappingCode').value, 'objectMappingCode.js');
+            saveTextAsFile(document.getElementById('validationCode').value, 'validationCode.js');
+        }
     </script>
 </head>
 <body>
@@ -49,9 +119,28 @@
     <textarea id="tableStructure" rows="10" cols="80" placeholder="테이블 구조를 여기에 입력하세요"></textarea><br>
     <button onclick="generateUseStateHooks()">useState 코드 생성</button>
 
-    <h2>생성된 useState 코드</h2>
-    <textarea id="generatedCode" rows="20" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('generatedCode').value, 'useStateCode.js')">코드 저장</button>
+    <h2>useState 코드</h2>
+    <textarea id="useStateCode" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('useStateCode').value, 'useStateCode.js')">useState 코드 저장</button>
+
+    <h2>초기화 핸들러 코드 (handleInitClick)</h2>
+    <textarea id="initHandlerCode" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('initHandlerCode').value, 'initHandlerCode.js')">초기화 핸들러 코드 저장</button>
+
+    <h2>handle<TableName>CodeClick 코드</h2>
+    <textarea id="setFindEntityCode" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('setFindEntityCode').value, 'handleClickCode.js')">handle<TableName>CodeClick 코드 저장</button>
+
+    <h2>오브젝트 매핑 코드</h2>
+    <textarea id="objectMappingCode" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('objectMappingCode').value, 'objectMappingCode.js')">오브젝트 매핑 코드 저장</button>
+
+    <h2>유효성 검사 코드 (validateCheck)</h2>
+    <textarea id="validationCode" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('validationCode').value, 'validationCode.js')">유효성 검사 코드 저장</button>
+
+    <br><br>
+    <button onclick="saveAll()">전체 저장</button>
 
 </body>
 </html>

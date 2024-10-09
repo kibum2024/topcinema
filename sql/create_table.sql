@@ -10,7 +10,7 @@ CREATE TABLE seat_structures (
 drop table cinemas;
 
 CREATE TABLE cinemas (
-    cinema_code INT AUTO_INCREMENT PRIMARY KEY,
+    cinema_code INT AUTO_INCREMENT,
     cinema_name VARCHAR(100) not null,
     road_code CHAR(5),
     address VARCHAR(100),
@@ -21,8 +21,8 @@ CREATE TABLE cinemas (
     latitude DECIMAL(8,6) DEFAULT 0,
     region_code INT  DEFAULT 0,
     registration_date CHAR(8),
-    user_code INT
-
+    user_code INT,
+    PRIMARY KEY (cinema_code),
 );
 
 
@@ -30,10 +30,9 @@ CREATE TABLE cinemas (
 DROP table theaters;
 
 CREATE TABLE theaters (
-    theater_code INT AUTO_INCREMENT,  -- theater_code를 단일 PK로 설정
-    cinema_code INT NOT NULL,          -- cinema_code를 외래키로 사용
-    theater_name VARCHAR(100),
+    theater_code INT AUTO_INCREMENT,  
+    cinema_code INT NOT NULL,       
     theater_type CHAR(1),
-    PRIMARY KEY (theater_code),        -- theater_code가 단일 PK
-    FOREIGN KEY (cinema_code) REFERENCES cinemas(cinema_code)  -- cinemas 테이블의 cinema_code와 관계
+    PRIMARY KEY (theater_code),        
+    FOREIGN KEY (cinema_code) REFERENCES cinemas(cinema_code)  
 );

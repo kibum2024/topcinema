@@ -3,6 +3,7 @@ import { IoClose, IoChevronBack, IoChevronForward } from "react-icons/io5";
 import KbButton from 'components/KbButton';
 import ManagerMovie from 'manager/movie/ManagerMovie';
 import ManagerCinema from 'manager/cinema/ManagerCinema';
+import ManagerTheater from 'manager/cinema/ManagerTheater';
 
 // 로컬 스토리지에 저장하는 함수
 const saveToLocalStorage = (key, value) => {
@@ -16,16 +17,13 @@ const loadFromLocalStorage = (key, defaultValue) => {
 };
 
 const TabMenu = forwardRef((props, ref) => {
-  // 로컬 스토리지에서 초기 탭 정보 및 상태 불러오기
   const [tabs, setTabs] = useState(loadFromLocalStorage('tabs', [{ title: '메인', content: 'This is the 메인 page.', component: 'Form1' }]));
   const [activeTab, setActiveTab] = useState(loadFromLocalStorage('activeTab', '메인'));
+  // 로컬 스토리지에서 초기 탭 정보 및 상태 불러오기
   const [tabStates, setTabStates] = useState(loadFromLocalStorage('tabStates', {
     ManagerMovie: {},
     ManagerCinema: {},
-    Form2: {},
-    Form3: {},
-    UserManagement: {},
-    ClientInformation: {},
+    ManagerTheater: {},
   }));
   const tabsContainerRef = useRef(null);
   const [totalTabsWidth, setTotalTabsWidth] = useState(0);
@@ -34,8 +32,7 @@ const TabMenu = forwardRef((props, ref) => {
   const componentMap = {
     ManagerMovie: <ManagerMovie formData={tabStates['Form3']} setFormData={(data) => updateTabState('ManagerMovie', data)} />,
     ManagerCinema: <ManagerCinema formData={tabStates['Form3']} setFormData={(data) => updateTabState('ManagerCinema', data)} />,
-    // UserManagement: <UserManagement formData={tabStates['UserManagement']} setFormData={(data) => updateTabState('UserManagement', data)} />,
-    // ClientInformation: <ClientInformation formData={tabStates['ClientInformation']} setFormData={(data) => updateTabState('ClientInformation', data)} />,
+    ManagerTheater: <ManagerTheater formData={tabStates['Form3']} setFormData={(data) => updateTabState('ManagerTheater', data)} />,
   };
 
   useEffect(() => {
@@ -118,7 +115,7 @@ const TabMenu = forwardRef((props, ref) => {
 
   return (
     <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-      <div>
+      <div style={{ width: '100%', height: '5%', overflow: 'hidden' }}>
         <div
           ref={tabsContainerRef}
           style={{
@@ -174,13 +171,12 @@ const TabMenu = forwardRef((props, ref) => {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '42px', right: '5px' }}>
+        {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'absolute', top: '42px', right: '5px' }}> */}
+        <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', position: 'absolute', top: '42px', right: '0.5%' }}>
           <KbButton textProp={'모두닫기'} iconProp={"닫기"} stateProp={true} onClick={removeAllTabs} />
         </div>
       </div>
-
-      {/* <div style={{ height: '610px', overflow: 'hidden' }}> */}
-      <div style={{ height: '97%', overflow: 'hidden' }}>
+      <div style={{ width: '100%', height: '95%', overflow: 'hidden'}}>
         {activeTab && componentMap[tabs.find((tab) => tab.title === activeTab)?.component]}
       </div>
     </div>

@@ -10,6 +10,10 @@
             const tableName = extractTableName(tableStructure);
             const fields = extractFields(tableStructure);
             const primaryKeyFields = extractPrimaryKeys(tableStructure);
+            const autoIncrementFields = extractAutoIncrementFields(tableStructure);
+
+            // TIMESTAMP 필드가 있는지 확인
+            let containsTimestamp = fields.some(field => field.type === 'TIMESTAMP');
 
             if (!tableName || fields.length === 0) {
                 alert("테이블 구조를 정확히 입력해 주세요.");
@@ -17,7 +21,15 @@
             }
 
             // Model Class
-            let modelCode = `package com.topcinema.backend.model;\n\nimport jakarta.persistence.*;\nimport lombok.Getter;\nimport lombok.Setter;\n\n@Entity\n@Getter\n@Setter\n@Table(name = "${tableName}")\n`;
+            let modelCode = `package com.topcinema.backend.model;\n\nimport jakarta.persistence.*;\nimport lombok.Getter;\nimport lombok.Setter;\n`;
+
+            // TIMESTAMP 필드가 있으면 LocalDateTime 및 Auditing 관련 import 추가
+            if (containsTimestamp) {
+                modelCode += `import java.time.LocalDateTime;\nimport org.springframework.data.annotation.CreatedDate;\nimport org.springframework.data.annotation.LastModifiedDate;\nimport org.springframework.data.jpa.domain.support.AuditingEntityListener;\n\n`;
+                modelCode += `@EntityListeners(AuditingEntityListener.class)\n`;
+            }
+
+            modelCode += `@Entity\n@Getter\n@Setter\n@Table(name = "${tableName}")\n`;
 
             if (primaryKeyFields.length > 1) {
                 modelCode += `@IdClass(${capitalize(tableName)}Id.class)\n`;
@@ -28,11 +40,24 @@
             fields.forEach(field => {
                 if (["CREATE", "SELECT", "INSERT", "DELETE", "UPDATE", "TABLE"].includes(field.name.toUpperCase())) return;
 
-                modelCode += `    @Column(name = "${field.name}"${field.length ? `, length = ${field.length}` : ''})\n`;
-                if (primaryKeyFields.includes(field.name)) {
-                    modelCode += `    @Id\n`;
+                // TIMESTAMP 필드에 따라 @CreatedDate, @LastModifiedDate 추가
+                if (field.name === "created_at") {
+                    modelCode += `    @CreatedDate\n    @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")\n`;
+                    modelCode += `    private LocalDateTime ${convertToCamelCase(field.name)};\n\n`;
+                } else if (field.name === "updated_at") {
+                    modelCode += `    @LastModifiedDate\n    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")\n`;
+                    modelCode += `    private LocalDateTime ${convertToCamelCase(field.name)};\n\n`;
+                } else {
+                    // Normal fields
+                    modelCode += `    @Column(name = "${field.name}"${field.length ? `, length = ${field.length}` : ''})\n`;
+                    if (primaryKeyFields.includes(field.name)) {
+                        modelCode += `    @Id\n`;
+                        if (autoIncrementFields.includes(field.name)) {
+                            modelCode += `    @GeneratedValue(strategy = GenerationType.IDENTITY)\n`;
+                        }
+                    }
+                    modelCode += `    private ${convertType(field.type)} ${convertToCamelCase(field.name)};\n\n`;
                 }
-                modelCode += `    private ${convertType(field.type)} ${field.name};\n\n`;
             });
 
             modelCode += `}\n`;
@@ -43,7 +68,7 @@
                 idClassCode = `package com.topcinema.backend.model;\n\nimport java.io.Serializable;\nimport java.util.Objects;\n\npublic class ${capitalize(tableName)}Id implements Serializable {\n\n`;
                 primaryKeyFields.forEach(pkField => {
                     const field = fields.find(f => f.name === pkField);
-                    idClassCode += `    private ${convertType(field.type)} ${field.name};\n\n`;
+                    idClassCode += `    private ${convertType(field.type)} ${convertToCamelCase(field.name)};\n\n`;
                 });
 
                 idClassCode += `
@@ -52,12 +77,12 @@
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ${capitalize(tableName)}Id that = (${capitalize(tableName)}Id) o;
-        return ${primaryKeyFields.map(pkField => `Objects.equals(${pkField}, that.${pkField})`).join(' && ')}; 
+        return ${primaryKeyFields.map(pkField => `Objects.equals(${convertToCamelCase(pkField)}, that.${convertToCamelCase(pkField)})`).join(' && ')}; 
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(${primaryKeyFields.join(', ')});
+        return Objects.hash(${primaryKeyFields.map(pkField => convertToCamelCase(pkField)).join(', ')});
     }\n`;
 
                 idClassCode += `}\n`;
@@ -67,10 +92,10 @@
             const repositoryCode = `package com.topcinema.backend.repository;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\n@Repository\npublic interface ${capitalize(tableName)}Repository extends JpaRepository<${capitalize(tableName)}, ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'Integer'}> {\n}\n`;
 
             // Service Class
-            const serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\nimport java.util.Optional;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n\n    public ${capitalize(tableName)} create${capitalize(tableName)}(${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Repository.save(${tableName.toLowerCase()});\n    }\n\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}, ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        Optional<${capitalize(tableName)}> existingEntity = ${tableName}Repository.findById(id);\n        if (existingEntity.isPresent()) {\n            ${tableName.toLowerCase()}.setMovie_code(id); // 정확한 컬럼명으로 설정\n            return ${tableName}Repository.save(${tableName.toLowerCase()});\n        }\n        return null;\n    }\n\n    public boolean delete${capitalize(tableName)}(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        Optional<${capitalize(tableName)}> ${tableName.toLowerCase()} = ${tableName}Repository.findById(id);\n        if (${tableName.toLowerCase()}.isPresent()) {\n            ${tableName}Repository.delete(${tableName.toLowerCase()}.get());\n            return true;\n        }\n        return false;\n    }\n}\n`;
+            const serviceCode = generateServiceCode(tableName, fields, primaryKeyFields);
 
             // Controller Class
-            const controllerCode = `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n\n    // 생성\n    @PostMapping("/createmovies")\n    public ${capitalize(tableName)} create${capitalize(tableName)}(@RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.create${capitalize(tableName)}(${tableName.toLowerCase()});\n    }\n\n    // ID로 수정\n    @PutMapping("/updatemovies/{id}")\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id, @RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.update${capitalize(tableName)}ById(id, ${tableName.toLowerCase()});\n    }\n\n    // 삭제\n    @DeleteMapping("/deletemovies/{id}")\n    public boolean delete${capitalize(tableName)}(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.delete${capitalize(tableName)}(id);\n    }\n}\n`;
+            const controllerCode = generateControllerCode(tableName, primaryKeyFields);
 
             document.getElementById('model').value = modelCode;
             document.getElementById('repository').value = repositoryCode;
@@ -81,6 +106,45 @@
             } else {
                 document.getElementById('idClass').value = "복합 키가 없습니다.";
             }
+        }
+
+        function generateServiceCode(tableName, fields, primaryKeyFields) {
+            let serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\nimport java.util.Optional;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName.toLowerCase()}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName.toLowerCase()}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName.toLowerCase()}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n\n    public ${capitalize(tableName)} create${capitalize(tableName)}(${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName.toLowerCase()}Repository.save(${tableName.toLowerCase()});\n    }\n\n`;
+
+            // Update by ID 메서드 추가 (복합 키와 단일 키 구분)
+            if (primaryKeyFields.length > 1) {
+                serviceCode += `    public ${capitalize(tableName)} update${capitalize(tableName)}ById(${capitalize(tableName)}Id id, ${capitalize(tableName)} updated${capitalize(tableName)}) {\n`;
+                serviceCode += `        if (${tableName.toLowerCase()}Repository.existsById(id)) {\n`;
+
+                // 각 복합 키에 대해 setter 추가
+                primaryKeyFields.forEach(pkField => {
+                    serviceCode += `            updated${capitalize(tableName)}.set${capitalize(convertToCamelCase(pkField))}(id.get${capitalize(convertToCamelCase(pkField))}());\n`;
+                });
+
+                serviceCode += `            return ${tableName.toLowerCase()}Repository.save(updated${capitalize(tableName)});\n        }\n        return null;\n    }\n`;
+            } else {
+                serviceCode += `    public ${capitalize(tableName)} update${capitalize(tableName)}ById(int id, ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n`;
+                serviceCode += `        Optional<${capitalize(tableName)}> existingEntity = ${tableName.toLowerCase()}Repository.findById(id);\n`;
+                serviceCode += `        if (existingEntity.isPresent()) {\n`;
+                serviceCode += `            ${tableName.toLowerCase()}.set${capitalize(convertToCamelCase(primaryKeyFields[0]))}(id);\n`;
+                serviceCode += `            return ${tableName.toLowerCase()}Repository.save(${tableName.toLowerCase()});\n`;
+                serviceCode += `        }\n        return null;\n    }\n`;
+            }
+
+            // Delete by ID 메서드 추가
+            serviceCode += `    public boolean delete${capitalize(tableName)}(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n`;
+            serviceCode += `        Optional<${capitalize(tableName)}> ${tableName.toLowerCase()} = ${tableName.toLowerCase()}Repository.findById(id);\n`;
+            serviceCode += `        if (${tableName.toLowerCase()}.isPresent()) {\n`;
+            serviceCode += `            ${tableName.toLowerCase()}Repository.delete(${tableName.toLowerCase()}.get());\n`;
+            serviceCode += `            return true;\n        }\n        return false;\n    }\n`;
+
+            serviceCode += `}\n`;
+
+            return serviceCode;
+        }
+
+        function generateControllerCode(tableName, primaryKeyFields) {
+            return `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n\n    // 생성\n    @PostMapping("/create${tableName.toLowerCase()}")\n    public ${capitalize(tableName)} create${capitalize(tableName)}(@RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.create${capitalize(tableName)}(${tableName.toLowerCase()});\n    }\n\n    // ID로 수정\n    @PutMapping("/update${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id, @RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.update${capitalize(tableName)}ById(id, ${tableName.toLowerCase()});\n    }\n\n    // 삭제\n    @DeleteMapping("/delete${tableName.toLowerCase()}/{id}")\n    public boolean delete${capitalize(tableName)}(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.delete${capitalize(tableName)}(id);\n    }\n}\n`;
         }
 
         function extractTableName(structure) {
@@ -102,6 +166,11 @@
             return match ? match[1].split(',').map(field => field.trim()) : [];
         }
 
+        function extractAutoIncrementFields(structure) {
+            const autoIncrementMatches = structure.match(/(\w+)\s+.*AUTO_INCREMENT/g);
+            return autoIncrementMatches ? autoIncrementMatches.map(match => match.split(' ')[0]) : [];
+        }
+
         function saveTextAsFile(text, filename) {
             const blob = new Blob([text], { type: 'text/plain' });
             const link = document.createElement('a');
@@ -112,6 +181,10 @@
 
         function capitalize(word) {
             return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+
+        function convertToCamelCase(fieldName) {
+            return fieldName.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
         }
 
         function convertType(sqlType) {
@@ -132,6 +205,11 @@
                 case 'char(8)':
                 case 'char':
                     return 'String';
+                case 'decimal(8,6)':
+                    return 'BigDecimal';
+                case 'datetime':
+                case 'timestamp':
+                    return 'LocalDateTime'; // LocalDateTime 처리
                 default:
                     return 'String';
             }

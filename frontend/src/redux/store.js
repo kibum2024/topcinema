@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import BannerSlice from './BannerSlice';
-import ManagerCheck from './ManagerCheck';
+import UserState from './UserState';
+import ScreenSlice from './ScreenSlice';
 
 export const store = configureStore({
   reducer: {
     banner: BannerSlice,
-    manager: ManagerCheck,
+    userState: UserState,
+    screenSize: ScreenSlice,
   },
 });

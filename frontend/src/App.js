@@ -6,11 +6,11 @@ import ManagerMenu from 'manager/system/ManagerMenu';
 import './App.css';
 
 function App() {
-  const isManagerVisible = useSelector((state) => state.manager.isManagerVisible);
+  const isUserType = useSelector((state) => state.userState.userType);
 
   return (
     <div className="app-main-wrap">
-      {isManagerVisible ? 
+      {isUserType ? 
       (
         <div className='app-manager-content-wrap'>
           <ManagerMenu />
