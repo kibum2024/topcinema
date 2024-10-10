@@ -2,14 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import Kbbutton from './KbButton';
 import { FaSearch } from 'react-icons/fa';
 
-const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightProp, inputDatasProp, codeProp, nameProp }) => {
+const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightProp, inputDatasProp, 
+                                codeProp, nameProp, codeValueProp, nameValueProp, onClick }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [inputCode, setInputCode] = useState('');
-  const [inputName, setInputName] = useState('');
+  const [inputCode, setInputCode] = useState(codeValueProp);
+  const [inputName, setInputName] = useState(nameValueProp);
   const [inputSearchName, setInputSearchName] = useState('');
   const [filterDatas, setFilterDatas] = useState(inputDatasProp);
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemRefs = useRef([]);
+
+  useEffect(() => {
+    if (codeValueProp) {
+      setInputCode(codeValueProp);
+      setInputName(nameValueProp);
+    }
+  }, [codeValueProp]);
 
   const togglePopup = () => {
     setIsPopupOpen(!isPopupOpen);
@@ -23,24 +31,32 @@ const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightPr
   
     // 한글인지 확인하는 정규식
     const isKorean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(inputValue);
-  
-    if (e.key === 'Enter' && inputValue !== '') {
+
+    // if (e.key === 'Enter' && inputValue !== '') {
+    if (inputValue !== '') {
       let result;
   
       if (isNumber) {
         // 숫자일 경우 코드로 필터링
-        result = inputDatasProp.find(inputData => inputData[codeProp].includes(inputValue));
+        result = inputDatasProp.find(inputData => 
+          typeof inputData[codeProp] === 'number' && inputData[codeProp] === Number(inputValue)
+        );
       } else if (isKorean) {
         // 한글일 경우 이름으로 필터링
-        result = inputDatasProp.find(inputData => inputData[nameProp].includes(inputValue));
+        result = inputDatasProp.find(inputData => 
+          typeof inputData[nameProp] === 'string' && inputData[nameProp].includes(inputValue)
+        );
       }
   
       if (result) {
-        setInputCode(result.code);
-        setInputName(result.name);
+        setInputCode(result[codeProp]);
+        setInputName(result[nameProp]);
       } else {
         setInputCode('');
         setInputName('');
+      }
+      if (onClick) {
+        onClick(inputCode, inputName);
       }
     }
   };
@@ -69,7 +85,7 @@ const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightPr
     if (e.key === 'Enter') {
       selectedInputData(code, name);
     }
-  }
+}
 
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
@@ -128,6 +144,9 @@ const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightPr
   const selectedInputData = (code, name) => {
     setInputCode(code);
     setInputName(name);
+    if (onClick) {
+      onClick(code, name);
+    }
     togglePopup();
   }
 
@@ -152,21 +171,26 @@ const KbSearchInputNoTitle = ({ itemProp, codeWidthProp, nameWidthProp, heightPr
           value={inputCode} 
           onChange={inputDataChang} 
           onKeyDown={InputDataFind}
+          onBlur={InputDataFind}
+          disabled
         />
         <div 
           onClick={togglePopup}
           style={{ 
-            border: '1px solid rgb(236, 239, 243)', 
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             width: `${heightProp - 2}px`, 
             height: `${heightProp - 2}px`,
             lineHeight: `${heightProp - 2}px`,
             textAlign: 'center',
             color: '#ccc', 
             backgroundColor: '#fff',
+            border: '1px solid rgb(236, 239, 243)', 
             cursor: 'pointer' 
           }}
         >
-          <FaSearch style={{ paddingTop: '0px', width: '16px', height: '16px', lineHeight: '16px', color: '#aaa' }} />
+          <FaSearch size={16} style={{ paddingTop: '0px', color: '#aaa' }} />
         </div>
         <input 
           type="text"

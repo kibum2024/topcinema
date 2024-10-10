@@ -26,7 +26,7 @@ public class Theaters {
     @Column(name = "cinema_code")
     private Integer cinemaCode;
 
-    @Column(name = "theater_type", length = 1)
+    @Column(name = "theater_type", length = 2)
     private String theaterType;
 
     @Column(name = "user_code")

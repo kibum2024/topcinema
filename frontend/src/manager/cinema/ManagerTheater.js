@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import KbButton from 'components/KbButton';
@@ -18,6 +18,9 @@ const ManagerTheater = () => {
   const [insertButtonState, setInsertButtonState] = useState(true);
   const [updateButtonState, setUpdateButtonState] = useState(true);
   const [deleteButtonState, setDeleteButtonState] = useState(true);
+  const fileInputRef = useRef(null);
+  const [seatInfos, setSeatInfos] = useState([]);
+
 
   const [theaterCode, setTheaterCode] = useState("");
   const [theaterName, setTheaterName] = useState("");
@@ -30,17 +33,18 @@ const ManagerTheater = () => {
 
   const [columnDefs] = useState([
     { headerName: '선택', checkboxSelection: true, width: 50, align: 'center', search: false },
-    { headerName: '영화관코드', field: 'cinema_code', width: 50, align: 'center', chartype: 'number' },
-    { headerName: '영화관명', field: 'cinema_name', width: 220, align: 'left', chartype: 'string', search: true },
-    { headerName: '관람관코드', field: 'theater_code', width: 50, align: 'center', chartype: 'number' },
+    { headerName: '코드', field: 'cinema_code', width: 50, align: 'center', chartype: 'number' },
+    { headerName: '영화관명', field: 'cinema_name', width: 200, align: 'left', chartype: 'string', search: true },
+    { headerName: '코드', field: 'theater_code', width: 50, align: 'center', chartype: 'number' },
     { headerName: '관람관명', field: 'theater_name', width: 120, align: 'left', chartype: 'string', search: true },
-    { headerName: '등록일', field: 'created_at', width: 100, align: 'center', chartype: 'timestamp' },
+    { headerName: '등록일', field: 'created_at', width: 130, align: 'center', chartype: 'timestamp' },
   ]);
 
   const handleInitClick = () => {
     setTheaterCode("");
     setTheaterName("");
     setCinemaCode("");
+    setCinemaName("");
     setTheaterType("01");
     setUserCode(isUserCode);
     setCreatedAt("");
@@ -128,7 +132,7 @@ const ManagerTheater = () => {
         user_code: userCode,
         created_at: createdAt,
         updated_at: updatedAt,
-    });
+      });
       alert('자료가 저장되었습니다.');
       setChangDataCheck(!changDataCheck);
     } catch (error) {
@@ -148,8 +152,8 @@ const ManagerTheater = () => {
         theater_type: theaterType,
         user_code: userCode,
         created_at: createdAt,
-        updated_at: updatedAt,      
-    });
+        updated_at: updatedAt,
+      });
       alert("자료가 수정되었습니다.");
       setChangDataCheck(!changDataCheck);
     } catch (error) {
@@ -173,14 +177,17 @@ const ManagerTheater = () => {
 
   const handleTheaterCodeClick = (theaterCode) => {
     const findTheater = theaters.find(theater => theater.theater_code === theaterCode);
+    // console.log("theaterCode : ", theaterCode);
+    // console.log("findTheater : ", findTheater);
     if (findTheater) {
-      setTheaterCode(findTheater.theaterCode);
-      setTheaterName(findTheater.theaterName);
-      setCinemaCode(findTheater.cinemaCode);
-      setTheaterType(findTheater.theaterType);
-      setUserCode(findTheater.userCode);
-      setCreatedAt(findTheater.createdAt);
-      setUpdatedAt(findTheater.updatedAt);
+      setTheaterCode(findTheater.theater_code);
+      setTheaterName(findTheater.theater_name);
+      setCinemaCode(findTheater.cinema_code);
+      setCinemaName(findTheater.cinema_name);
+      setTheaterType(findTheater.theater_type);
+      setUserCode(findTheater.user_code);
+      setCreatedAt(findTheater.created_at);
+      setUpdatedAt(findTheater.updated_at);
     }
   };
 
@@ -199,6 +206,73 @@ const ManagerTheater = () => {
   const handleMovieTypeClick = (theaterType) => {
     setTheaterType(theaterType);
   };
+
+  const handleCinemaClick = (cinaemaCode, cinemaName) => {
+    console.log("cinaemaCode : ", cinaemaCode);
+    console.log("cinemaName : ", cinemaName);
+
+    setCinemaCode(cinaemaCode);
+    setCinemaName(cinemaName);
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click();  // 숨겨진 input 요소 클릭 트리거
+  };
+
+  const handleUploadExcel = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        setSeatInfos(csvToJson(text));
+      };
+      reader.readAsText(file);
+    }
+    event.target.value = null;
+  };
+
+  const csvToJson = (csv) => {
+    const rows = csv.split('\n');
+    const result = { rows: [] };
+    let seatCount = 1;
+
+    for (let i = 0; i < rows.length; i++) {
+      const cols = rows[i].split(',');
+      const rowNumber = cols[0];
+      const seats = [];
+
+      seatCount = 1;
+      for (let j = 1; j < cols.length; j++) {
+        let seatType = "";
+        let seatNumber = "";
+        let colstr = cols[j].trim();
+        if (colstr === "TR") {
+          seatType = "aisle";
+          seatNumber = "";
+        } else if (colstr === "BK") {
+          seatType = "blank";
+          seatNumber = "";
+          seatCount += 1;
+        } else if (colstr === "/") {
+          seatType = "handicap";
+          seatNumber = seatCount;
+          seatCount += 1;
+        } else {
+          seatType = "seat";
+          seatNumber = colstr;
+          seatCount += 1;
+        };
+        seats.push({ seat_number: seatNumber, type: seatType, reserved: "false", selected: "false" });
+      }
+
+      result.rows.push({ row_number: rowNumber, seats: seats });
+    }
+
+    return result;
+  }
+
+
 
   return (
     <div className='manager-theater-wrap'>
@@ -233,31 +307,59 @@ const ManagerTheater = () => {
         <div className='manager-theater-right-input'>
           <div className="manager-theater-right-input-line">
             <label htmlFor="" className="manager-theater-right-input-label">영화관<span className='compulsory-item'>*</span></label>
-            <KbSearchInputNoTitle 
+            <KbSearchInputNoTitle
               itemProp={"영화관"}
               codeWidthProp={80}
               nameWidthProp={200}
               heightProp={25}
-              inputDatasProp={cinemas} 
-              codeProp={"cinema_code"} 
+              inputDatasProp={cinemas}
+              codeProp={"cinema_code"}
               nameProp={"cinema_name"}
+              codeValueProp={cinemaCode}
+              nameValueProp={cinemaName}
+              onClick={handleCinemaClick}
             />
           </div>
           <div className="manager-theater-right-input-line">
-            <label htmlFor="" className="manager-theater-right-input-label">영화관명<span className='compulsory-item'>*</span></label>
-            <input className="width400" type="text" maxlength="50" value={cinemaName} onChange={(e) => { setCinemaName(e.target.value) }} />
-          </div>
-          <div className="manager-theater-right-input-line">
             <label htmlFor="" className="manager-theater-right-input-label">관람관코드</label>
-            <input className="width100 input_movie_code" type="text" disabled value={cinemaCode} />
+            <input className="width100 input_movie_code" type="text" disabled value={theaterCode} />
           </div>
           <div className="manager-theater-right-input-line">
             <label htmlFor="" className="manager-theater-right-input-label">관람관명<span className='compulsory-item'>*</span></label>
-            <input className="width400" type="text" maxlength="50" value={cinemaName} onChange={(e) => { setCinemaName(e.target.value) }} />
+            <input className="width400" type="text" maxlength="50" value={theaterName} onChange={(e) => { setTheaterName(e.target.value) }} />
           </div>
           <div className="manager-theater-right-input-line">
             <label htmlFor="" className="manager-theater-right-input-label">관람관구분<span className='compulsory-item'>*</span></label>
             <KbComboInButton comboDataProp={theaterTypes} userProp={theaterType} comboWidthProp={100} comboHeightProp={24} onClick={handleMovieTypeClick} />
+          </div>
+          <div className="manager-theater-right-input-line">
+            <label htmlFor="" className="manager-theater-right-input-label">관람석<span className='compulsory-item'>*</span></label>
+            <KbButton textProp={"엑셀업로드"} iconProp={"엑셀"} stateProp={true} onClick={() => handleButtonClick()} />
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleUploadExcel}
+            />
+          </div>
+          <div class="movie-screen">S  C  R  E  E  N</div>
+          <div>
+            {seatInfos.rows.map((row, rowIndex) => (
+              <div key={rowIndex} className="row">
+                <h3>Row {row.row_number}</h3>
+                <div className="seats">
+                  {row.seats.map((seat, seatIndex) => (
+                    <div
+                      key={seatIndex}
+                      className={`seat ${seat.reserved === 'true' ? 'reserved' : ''} ${seat.selected === 'true' ? 'selected' : ''}`}
+                    >
+                      Seat {seat.seat_number}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

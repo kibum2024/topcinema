@@ -34,7 +34,7 @@ CREATE TABLE theaters (
     theater_code INT AUTO_INCREMENT,
     theater_name VARCHAR(100) not null,
     cinema_code INT NOT NULL,       
-    theater_type CHAR(1),
+    theater_type CHAR(2),
     user_code INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,   
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
