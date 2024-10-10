@@ -29,7 +29,7 @@ public class TheatersService {
     public Theaters updateTheatersById(int id, Theaters theaters) {
         Optional<Theaters> existingEntity = theatersRepository.findById(id);
         if (existingEntity.isPresent()) {
-            theaters.setTheaterCode(id);
+            theaters.setTheater_code(id);
             return theatersRepository.save(theaters);
         }
         return null;

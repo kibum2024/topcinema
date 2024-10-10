@@ -3,97 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>React useState 코드 생성기</title>
+    <title>Spring Boot 코드 생성기</title>
     <script>
-        function generateUseStateHooks() {
-            const tableStructure = document.getElementById('tableStructure').value.trim();
+        function generateCode() {
+            const tableStructure = document.getElementById('tableStructure').value;
+            const tableName = extractTableName(tableStructure);
             const fields = extractFields(tableStructure);
-            const tableName = extractTableName(tableStructure);  // 테이블명 추출
+            const primaryKeyFields = extractPrimaryKeys(tableStructure);
+            const autoIncrementFields = extractAutoIncrementFields(tableStructure);
 
-            let useStateCode = '';
-            let initHandlerCode = 'const handleInitClick = () => {\n';
-            let setFindEntityCode = `const handle${capitalize(tableName.slice(0, -1))}CodeClick = (${tableName.slice(0, -1)}Code) => {\n`;
-            setFindEntityCode += `  const find${capitalize(tableName.slice(0, -1))} = ${tableName}.find(${tableName.slice(0, -1)} => ${tableName.slice(0, -1)}.${tableName.slice(0, -1)}_code === ${tableName.slice(0, -1)}Code);\n`;
-            setFindEntityCode += `  if (find${capitalize(tableName.slice(0, -1))}) {\n`;
-            let objectMappingCode = '';
-            let validationCode = 'const validateCheck = () => {\n';
-            let hasValidation = false;  // 유효성 검사 코드가 추가되었는지 확인
-            
+            // TIMESTAMP 필드가 있는지 확인
+            let containsTimestamp = fields.some(field => field.type === 'TIMESTAMP');
+
+            if (!tableName || fields.length === 0) {
+                alert("테이블 구조를 정확히 입력해 주세요.");
+                return;
+            }
+
+            // Model Class
+            let modelCode = `package com.topcinema.backend.model;\n\nimport jakarta.persistence.*;\nimport lombok.Getter;\nimport lombok.Setter;\n`;
+
+            // TIMESTAMP 필드가 있으면 LocalDateTime 및 Auditing 관련 import 추가
+            if (containsTimestamp) {
+                modelCode += `import java.time.LocalDateTime;\nimport org.springframework.data.annotation.CreatedDate;\nimport org.springframework.data.annotation.LastModifiedDate;\nimport org.springframework.data.jpa.domain.support.AuditingEntityListener;\n\n`;
+                modelCode += `@EntityListeners(AuditingEntityListener.class)\n`;
+            }
+
+            modelCode += `@Entity\n@Getter\n@Setter\n@Table(name = "${tableName}")\n`;
+
+            if (primaryKeyFields.length > 1) {
+                modelCode += `@IdClass(${capitalize(tableName)}Id.class)\n`;
+            }
+
+            modelCode += `public class ${capitalize(tableName)} {\n\n`;
+
             fields.forEach(field => {
-                const stateName = toCamelCase(field.name);
-                const capitalizedStateName = capitalize(stateName);
+                if (["CREATE", "SELECT", "INSERT", "DELETE", "UPDATE", "TABLE"].includes(field.name.toUpperCase())) return;
 
-                // useState 코드 생성
-                useStateCode += `const [${stateName}, set${capitalizedStateName}] = useState("");\n`;
-
-                // 초기화 핸들러 코드
-                initHandlerCode += `  set${capitalizedStateName}("");\n`;
-
-                // setFindEntity 코드
-                setFindEntityCode += `    set${capitalizedStateName}(find${capitalize(tableName.slice(0, -1))}.${convertToCamelCase(field.name)});\n`;
-
-                // 객체 매핑 코드
-                objectMappingCode += `  ${field.name}: ${stateName},\n`;
-
-                // 유효성 검사 코드 생성 (VARCHAR, CHAR, TEXT 타입에 대해서만 유효성 검사)
-                if (field.type.includes('VARCHAR') || field.type.includes('CHAR') || field.type.includes('TEXT')) {
-                    hasValidation = true;
-                    validationCode += `  if (!${stateName} || ${stateName}.trim() === '') {\n`;
-                    validationCode += `    alert('${capitalize(field.name.replace('_', ' '))}을(를) 입력해주세요.');\n`;
-                    validationCode += `    return false;\n  }\n`;
+                // TIMESTAMP 필드에 따라 @CreatedDate, @LastModifiedDate 추가
+                if (field.name === "created_at") {
+                    modelCode += `    @CreatedDate\n    @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")\n`;
+                    modelCode += `    private LocalDateTime ${field.name};\n\n`;
+                } else if (field.name === "updated_at") {
+                    modelCode += `    @LastModifiedDate\n    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")\n`;
+                    modelCode += `    private LocalDateTime ${field.name};\n\n`;
+                } else {
+                    // Normal fields (컬럼명 그대로 사용)
+                    modelCode += `    @Column(name = "${field.name}"${field.length ? `, length = ${field.length}` : ''})\n`;
+                    if (primaryKeyFields.includes(field.name)) {
+                        modelCode += `    @Id\n`;
+                        if (autoIncrementFields.includes(field.name)) {
+                            modelCode += `    @GeneratedValue(strategy = GenerationType.IDENTITY)\n`;
+                        }
+                    }
+                    modelCode += `    private ${convertType(field.type)} ${field.name};\n\n`;  // 컬럼명을 그대로 사용
                 }
             });
 
-            initHandlerCode += '};';  // 초기화 핸들러 코드 끝
+            modelCode += `}\n`;
 
-            setFindEntityCode += '  }\n};';  // handleClick 코드 끝
+            // ID Class (for composite key)
+            let idClassCode = '';
+            if (primaryKeyFields.length > 1) {
+                idClassCode = `package com.topcinema.backend.model;\n\nimport java.io.Serializable;\nimport java.util.Objects;\n\npublic class ${capitalize(tableName)}Id implements Serializable {\n\n`;
+                primaryKeyFields.forEach(pkField => {
+                    const field = fields.find(f => f.name === pkField);
+                    idClassCode += `    private ${convertType(field.type)} ${field.name};\n\n`;
+                });
 
-            if (!hasValidation) {
-                validationCode += '  return true; // 모든 유효성 검사를 통과한 경우\n};';  // 유효성 검사 코드가 없는 경우
-            } else {
-                validationCode += '  return true;\n};';  // 유효성 검사가 있는 경우 끝
+                idClassCode += `
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ${capitalize(tableName)}Id that = (${capitalize(tableName)}Id) o;
+        return ${primaryKeyFields.map(pkField => `Objects.equals(${pkField}, that.${pkField})`).join(' && ')}; 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(${primaryKeyFields.join(', ')});
+    }\n`;
+
+                idClassCode += `}\n`;
             }
 
-            // 생성된 코드를 각각의 텍스트 영역에 출력
-            document.getElementById('useStateCode').value = useStateCode;
-            document.getElementById('initHandlerCode').value = initHandlerCode;
-            document.getElementById('setFindEntityCode').value = setFindEntityCode;
-            document.getElementById('objectMappingCode').value = objectMappingCode;
-            document.getElementById('validationCode').value = validationCode;
+            // Repository Interface
+            const repositoryCode = `package com.topcinema.backend.repository;\n\nimport org.springframework.data.jpa.repository.JpaRepository;\nimport org.springframework.stereotype.Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\n@Repository\npublic interface ${capitalize(tableName)}Repository extends JpaRepository<${capitalize(tableName)}, ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'Integer'}> {\n}\n`;
+
+            // Service Class
+            const serviceCode = generateServiceCode(tableName, fields, primaryKeyFields);
+
+            // Controller Class
+            const controllerCode = generateControllerCode(tableName, primaryKeyFields);
+
+            document.getElementById('model').value = modelCode;
+            document.getElementById('repository').value = repositoryCode;
+            document.getElementById('service').value = serviceCode;
+            document.getElementById('controller').value = controllerCode;
+            if (idClassCode) {
+                document.getElementById('idClass').value = idClassCode;
+            } else {
+                document.getElementById('idClass').value = "복합 키가 없습니다.";
+            }
         }
 
-        // 테이블명 추출 함수
+        function generateServiceCode(tableName, fields, primaryKeyFields) {
+            let serviceCode = `package com.topcinema.backend.service;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.stereotype.Service;\nimport com.topcinema.backend.repository.${capitalize(tableName)}Repository;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\nimport java.util.Optional;\n\n@Service\npublic class ${capitalize(tableName)}Service {\n\n    @Autowired\n    private ${capitalize(tableName)}Repository ${tableName.toLowerCase()}Repository;\n\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName.toLowerCase()}Repository.findAll();\n    }\n\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n        return ${tableName.toLowerCase()}Repository.findById(${primaryKeyFields.length > 1 ? 'id' : 'id'}).orElse(null);\n    }\n\n    public ${capitalize(tableName)} create${capitalize(tableName)}(${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName.toLowerCase()}Repository.save(${tableName.toLowerCase()});\n    }\n\n`;
+
+            // Update by ID 메서드 추가 (복합 키와 단일 키 구분)
+            if (primaryKeyFields.length > 1) {
+                serviceCode += `    public ${capitalize(tableName)} update${capitalize(tableName)}ById(${capitalize(tableName)}Id id, ${capitalize(tableName)} updated${capitalize(tableName)}) {\n`;
+                serviceCode += `        if (${tableName.toLowerCase()}Repository.existsById(id)) {\n`;
+
+                // 각 복합 키에 대해 setter 추가
+                primaryKeyFields.forEach(pkField => {
+                    serviceCode += `            updated${capitalize(tableName)}.set${capitalize(pkField)}(id.get${capitalize(pkField)}());\n`;
+                });
+
+                serviceCode += `            return ${tableName.toLowerCase()}Repository.save(updated${capitalize(tableName)});\n        }\n        return null;\n    }\n`;
+            } else {
+                serviceCode += `    public ${capitalize(tableName)} update${capitalize(tableName)}ById(int id, ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n`;
+                serviceCode += `        Optional<${capitalize(tableName)}> existingEntity = ${tableName.toLowerCase()}Repository.findById(id);\n`;
+                serviceCode += `        if (existingEntity.isPresent()) {\n`;
+                serviceCode += `            ${tableName.toLowerCase()}.set${capitalize(primaryKeyFields[0])}(id);\n`;
+                serviceCode += `            return ${tableName.toLowerCase()}Repository.save(${tableName.toLowerCase()});\n`;
+                serviceCode += `        }\n        return null;\n    }\n`;
+            }
+
+            // Delete by ID 메서드 추가
+            serviceCode += `    public boolean delete${capitalize(tableName)}(${primaryKeyFields.length > 1 ? capitalize(tableName) + 'Id id' : 'int id'}) {\n`;
+            serviceCode += `        Optional<${capitalize(tableName)}> ${tableName.toLowerCase()} = ${tableName.toLowerCase()}Repository.findById(id);\n`;
+            serviceCode += `        if (${tableName.toLowerCase()}.isPresent()) {\n`;
+            serviceCode += `            ${tableName.toLowerCase()}Repository.delete(${tableName.toLowerCase()}.get());\n`;
+            serviceCode += `            return true;\n        }\n        return false;\n    }\n`;
+
+            serviceCode += `}\n`;
+
+            return serviceCode;
+        }
+
+        function generateControllerCode(tableName, primaryKeyFields) {
+            return `package com.topcinema.backend.controller;\n\nimport org.springframework.beans.factory.annotation.Autowired;\nimport org.springframework.web.bind.annotation.*;\nimport com.topcinema.backend.service.${capitalize(tableName)}Service;\nimport com.topcinema.backend.model.${capitalize(tableName)};\n\nimport java.util.List;\n\n@RestController\n@RequestMapping("/api")\npublic class ${capitalize(tableName)}Controller {\n\n    @Autowired\n    private ${capitalize(tableName)}Service ${tableName}Service;\n\n    // 전체 조회\n    @GetMapping("/${tableName.toLowerCase()}")\n    public List<${capitalize(tableName)}> getAll${capitalize(tableName)}() {\n        return ${tableName}Service.getAll${capitalize(tableName)}();\n    }\n\n    // ID로 조회\n    @GetMapping("/${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} get${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.get${capitalize(tableName)}ById(id);\n    }\n\n    // 생성\n    @PostMapping("/create${tableName.toLowerCase()}")\n    public ${capitalize(tableName)} create${capitalize(tableName)}(@RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.create${capitalize(tableName)}(${tableName.toLowerCase()});\n    }\n\n    // ID로 수정\n    @PutMapping("/update${tableName.toLowerCase()}/{id}")\n    public ${capitalize(tableName)} update${capitalize(tableName)}ById(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id, @RequestBody ${capitalize(tableName)} ${tableName.toLowerCase()}) {\n        return ${tableName}Service.update${capitalize(tableName)}ById(id, ${tableName.toLowerCase()});\n    }\n\n    // 삭제\n    @DeleteMapping("/delete${tableName.toLowerCase()}/{id}")\n    public boolean delete${capitalize(tableName)}(@PathVariable ${primaryKeyFields.length > 1 ? `${capitalize(tableName)}Id` : 'int'} id) {\n        return ${tableName}Service.delete${capitalize(tableName)}(id);\n    }\n}\n`;
+        }
+
         function extractTableName(structure) {
             const match = structure.match(/CREATE TABLE (\w+)/);
-            return match ? match[1] : 'Entity';
+            return match ? match[1] : '';
         }
 
-        // 필드에서 CREATE, PRIMARY 등의 키워드를 제외하고 필드 추출
         function extractFields(structure) {
-            const ignoredKeywords = ['CREATE', 'PRIMARY', 'KEY', 'FOREIGN', 'AUTO_INCREMENT'];  // 제외할 키워드
-            const fieldLines = structure.split('\n').filter(line => {
-                const name = line.trim().split(/\s+/)[0];
-                return name && !ignoredKeywords.includes(name.toUpperCase());
-            });
-
+            const fieldLines = structure.split('\n').filter(line => line.trim().match(/^\s*\w+.*$/));
             return fieldLines.map(line => {
-                const parts = line.trim().split(/\s+/);  // line을 나누어 처리
-                if (parts.length < 2) return null; // 필드명과 타입이 없는 경우 무시
-                const [name, type] = parts;
-                return { name: name.replace(',', ''), type: type ? type.toUpperCase() : '' };
-            }).filter(field => field !== null);  // null 값이 들어가지 않도록 필터링
+                const [name, type] = line.trim().split(/\s+/);
+                const length = type.match(/\((\d+)\)/);
+                return { name: name.replace(',', ''), type: type.replace(/,\d+/g, ''), length: length ? parseInt(length[1]) : null };
+            }).filter(field => field.name !== 'PRIMARY');
         }
 
-        function toCamelCase(str) {
-            return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+        function extractPrimaryKeys(structure) {
+            const match = structure.match(/PRIMARY KEY\s*\(([^)]+)\)/);
+            return match ? match[1].split(',').map(field => field.trim()) : [];
         }
 
-        function convertToCamelCase(fieldName) {
-            return fieldName.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
-        }
-
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
+        function extractAutoIncrementFields(structure) {
+            const autoIncrementMatches = structure.match(/(\w+)\s+.*AUTO_INCREMENT/g);
+            return autoIncrementMatches ? autoIncrementMatches.map(match => match.split(' ')[0]) : [];
         }
 
         function saveTextAsFile(text, filename) {
@@ -104,43 +179,80 @@
             link.click();
         }
 
-        function saveAll() {
-            saveTextAsFile(document.getElementById('useStateCode').value, 'useStateCode.js');
-            saveTextAsFile(document.getElementById('initHandlerCode').value, 'initHandlerCode.js');
-            saveTextAsFile(document.getElementById('setFindEntityCode').value, 'handleClickCode.js');
-            saveTextAsFile(document.getElementById('objectMappingCode').value, 'objectMappingCode.js');
-            saveTextAsFile(document.getElementById('validationCode').value, 'validationCode.js');
+        function capitalize(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+
+        function convertToCamelCase(fieldName) {
+            return fieldName.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+        }
+
+        function convertType(sqlType) {
+            switch (sqlType.toLowerCase()) {
+                case 'int':
+                case 'int,':
+                case 'integer':
+                    return 'Integer';
+                case 'char(1)':
+                    return 'char';
+                case 'varchar(100)':
+                case 'varchar(20)':
+                case 'varchar(2000)':
+                case 'varchar(200)':
+                case 'varchar':
+                    return 'String';
+                case 'char(4)':
+                case 'char(8)':
+                case 'char':
+                    return 'String';
+                case 'decimal(8,6)':
+                    return 'BigDecimal';
+                case 'datetime':
+                case 'timestamp':
+                    return 'LocalDateTime'; // LocalDateTime 처리
+                default:
+                    return 'String';
+            }
         }
     </script>
 </head>
 <body>
-    <h1>React useState 코드 생성기</h1>
-
+    <h1>Spring Boot 코드 생성기</h1>
     <textarea id="tableStructure" rows="10" cols="80" placeholder="테이블 구조를 여기에 입력하세요"></textarea><br>
-    <button onclick="generateUseStateHooks()">useState 코드 생성</button>
+    <button onclick="generateCode()">코드 생성</button>
 
-    <h2>useState 코드</h2>
-    <textarea id="useStateCode" rows="10" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('useStateCode').value, 'useStateCode.js')">useState 코드 저장</button>
+    <h2>모델 코드</h2>
+    <textarea id="model" rows="20" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('model').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + '.java')">모델 저장</button>
 
-    <h2>초기화 핸들러 코드 (handleInitClick)</h2>
-    <textarea id="initHandlerCode" rows="10" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('initHandlerCode').value, 'initHandlerCode.js')">초기화 핸들러 코드 저장</button>
+    <h2>ID 클래스 코드 (복합 키)</h2>
+    <textarea id="idClass" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('idClass').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Id.java')">ID 클래스 저장</button>
 
-    <h2>handle<TableName>CodeClick 코드</h2>
-    <textarea id="setFindEntityCode" rows="10" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('setFindEntityCode').value, 'handleClickCode.js')">handle<TableName>CodeClick 코드 저장</button>
+    <h2>리포지토리 코드</h2>
+    <textarea id="repository" rows="10" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('repository').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Repository.java')">리포지토리 저장</button>
 
-    <h2>오브젝트 매핑 코드</h2>
-    <textarea id="objectMappingCode" rows="10" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('objectMappingCode').value, 'objectMappingCode.js')">오브젝트 매핑 코드 저장</button>
+    <h2>서비스 코드</h2>
+    <textarea id="service" rows="15" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('service').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Service.java')">서비스 저장</button>
 
-    <h2>유효성 검사 코드 (validateCheck)</h2>
-    <textarea id="validationCode" rows="10" cols="80"></textarea><br>
-    <button onclick="saveTextAsFile(document.getElementById('validationCode').value, 'validationCode.js')">유효성 검사 코드 저장</button>
+    <h2>컨트롤러 코드</h2>
+    <textarea id="controller" rows="15" cols="80"></textarea><br>
+    <button onclick="saveTextAsFile(document.getElementById('controller').value, capitalize(extractTableName(document.getElementById('tableStructure').value)) + 'Controller.java')">컨트롤러 저장</button>
 
     <br><br>
     <button onclick="saveAll()">전체 저장</button>
 
+    <script>
+        function saveAll() {
+            const tableName = capitalize(extractTableName(document.getElementById('tableStructure').value));
+            saveTextAsFile(document.getElementById('model').value, tableName + '.java');
+            saveTextAsFile(document.getElementById('idClass').value, tableName + 'Id.java');
+            saveTextAsFile(document.getElementById('repository').value, tableName + 'Repository.java');
+            saveTextAsFile(document.getElementById('service').value, tableName + 'Service.java');
+            saveTextAsFile(document.getElementById('controller').value, tableName + 'Controller.java');
+        }
+    </script>
 </body>
 </html>

@@ -8,35 +8,35 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
 @Setter
 @Table(name = "cinemas")
-@EntityListeners(AuditingEntityListener.class)
 public class Cinemas {
 
     @Column(name = "cinema_code")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer cinemaCode;
+    private Integer cinema_code;
 
     @Column(name = "cinema_name", length = 100)
-    private String cinemaName;
+    private String cinema_name;
 
     @Column(name = "post_code", length = 5)
-    private String postCode;
+    private String post_code;
 
     @Column(name = "address", length = 200)
     private String address;
 
     @Column(name = "detail_address", length = 200)
-    private String detailAddress;
+    private String detail_address;
 
     @Column(name = "public_transport_info", length = 2000)
-    private String publicTransportInfo;
+    private String public_transport_info;
 
     @Column(name = "parking_info", length = 2000)
-    private String parkingInfo;
+    private String parking_info;
 
     @Column(name = "longitude", length = 10)
     private String longitude;
@@ -45,17 +45,17 @@ public class Cinemas {
     private String latitude;
 
     @Column(name = "region_code")
-    private Integer regionCode;
+    private Integer region_code;
 
     @Column(name = "user_code")
-    private Integer userCode;
+    private Integer user_code;
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    private LocalDateTime created_at;
 
     @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    private LocalDateTime updated_at;
 
 }

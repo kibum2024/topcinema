@@ -29,12 +29,11 @@ public class CinemasService {
     public Cinemas updateCinemasById(int id, Cinemas cinemas) {
         Optional<Cinemas> existingEntity = cinemasRepository.findById(id);
         if (existingEntity.isPresent()) {
-            cinemas.setCinemaCode(id);
+            cinemas.setCinema_code(id);
             return cinemasRepository.save(cinemas);
         }
         return null;
     }
-
     public boolean deleteCinemas(int id) {
         Optional<Cinemas> cinemas = cinemasRepository.findById(id);
         if (cinemas.isPresent()) {

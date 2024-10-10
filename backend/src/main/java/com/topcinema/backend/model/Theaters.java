@@ -18,25 +18,25 @@ public class Theaters {
     @Column(name = "theater_code")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer theaterCode;
+    private Integer theater_code;
 
     @Column(name = "theater_name", length = 100)
-    private String theaterName;
+    private String theater_name;
 
     @Column(name = "cinema_code")
-    private Integer cinemaCode;
+    private Integer cinema_code;
 
     @Column(name = "theater_type", length = 2)
-    private String theaterType;
+    private String theater_type;
 
     @Column(name = "user_code")
-    private Integer userCode;
+    private Integer user_code;
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 }

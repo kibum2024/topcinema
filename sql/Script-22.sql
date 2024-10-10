@@ -1,11 +1,15 @@
+drop table seat_structures;
+
 CREATE TABLE seat_structures (
     cinema_code INT  not null,
     theater_code INT  not null,
-    seat_row INT  not null,
-    seat_col INT  not null,
-    seat_type CHAR(1),
+    seat_row VARCHAR(2) not null,
+    seat_col VARCHAR(2),
+    seat_type VARCHAR(10),
     PRIMARY KEY (cinema_code, theater_code, seat_row, seat_col)
 );
+
+select * from seat_structures
 
 drop table cinemas;
 

@@ -82,6 +82,24 @@ const ManagerTheater = () => {
     fetchCinemas();
   }, []);
 
+  const handleReadSeats = async () => {
+    try {
+      // Axios 요청을 기다리고, 그 결과를 response에 저장
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/seat_structures_all`, {
+        params: {
+          cinemaCode: 5,
+          theaterCode: 1
+        }
+      });
+  
+      // 요청이 성공하면 데이터를 setSeatInfos에 저장
+      setSeatInfos(response.data);
+    } catch (error) {
+      // 오류 발생 시 콘솔에 오류 출력
+      console.error('Error fetching seat data:', error);
+    }
+  };
+
   useEffect(() => {
     const fetchCommonCodes = async () => {
       try {
@@ -133,10 +151,21 @@ const ManagerTheater = () => {
         created_at: createdAt,
         updated_at: updatedAt,
       });
+      handleSaveSeats();
       alert('자료가 저장되었습니다.');
       setChangDataCheck(!changDataCheck);
     } catch (error) {
       console.error('Error creating :', error);
+    }
+  };
+
+  const handleSaveSeats = async () => {
+    try {
+      // 한 번의 요청만 남김
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/create_all_seat_structures`, seatInfos);
+      console.log('Seats saved successfully:', response.data);
+    } catch (error) {
+      console.error('Error saving seats:', error);
     }
   };
 
@@ -188,6 +217,7 @@ const ManagerTheater = () => {
       setUserCode(findTheater.user_code);
       setCreatedAt(findTheater.created_at);
       setUpdatedAt(findTheater.updated_at);
+      handleReadSeats();
     }
   };
 
@@ -225,7 +255,9 @@ const ManagerTheater = () => {
       const reader = new FileReader();
       reader.onload = function (e) {
         const text = e.target.result;
-        setSeatInfos(csvToJson(text));
+        const json = csvToJson(text);
+        console.log("json : ", json);
+        setSeatInfos(json);
       };
       reader.readAsText(file);
     }
@@ -234,39 +266,39 @@ const ManagerTheater = () => {
 
   const csvToJson = (csv) => {
     const rows = csv.split('\n');
-    const result = { rows: [] };
+    const result = { cinema_code: cinemaCode, theater_code: theaterCode, rows: [] };
     let seatCount = 1;
 
     for (let i = 0; i < rows.length; i++) {
       const cols = rows[i].split(',');
-      const rowNumber = cols[0];
+      const seatRow = cols[0];
       const seats = [];
 
       seatCount = 1;
       for (let j = 1; j < cols.length; j++) {
         let seatType = "";
-        let seatNumber = "";
+        let seatCol = "";
         let colstr = cols[j].trim();
         if (colstr === "TR") {
           seatType = "aisle";
-          seatNumber = "";
+          seatCol = "";
         } else if (colstr === "BK") {
           seatType = "blank";
-          seatNumber = "";
+          seatCol = "";
           seatCount += 1;
         } else if (colstr === "/") {
           seatType = "handicap";
-          seatNumber = seatCount;
+          seatCol = seatCount;
           seatCount += 1;
         } else {
           seatType = "seat";
-          seatNumber = colstr;
+          seatCol = colstr;
           seatCount += 1;
         };
-        seats.push({ seat_number: seatNumber, type: seatType, reserved: "false", selected: "false" });
+        seats.push({ seat_col: seatCol, seat_type: seatType });
       }
 
-      result.rows.push({ row_number: rowNumber, seats: seats });
+      result.rows.push({ seat_row: seatRow, seats: seats });
     }
 
     return result;
@@ -343,23 +375,26 @@ const ManagerTheater = () => {
               onChange={handleUploadExcel}
             />
           </div>
-          <div class="movie-screen">S  C  R  E  E  N</div>
-          <div>
-            {seatInfos.rows.map((row, rowIndex) => (
-              <div key={rowIndex} className="row">
-                <h3>Row {row.row_number}</h3>
-                <div className="seats">
-                  {row.seats.map((seat, seatIndex) => (
-                    <div
-                      key={seatIndex}
-                      className={`seat ${seat.reserved === 'true' ? 'reserved' : ''} ${seat.selected === 'true' ? 'selected' : ''}`}
-                    >
-                      Seat {seat.seat_number}
+          <div class="manager-theater-right-screen-wrap">
+            <div class="manager-theater-right-screen">S  C  R  E  E  N</div>
+            <div class="manager-theater-right-screen-seat-wrap">
+              {seatInfos && seatInfos.rows && (
+                seatInfos.rows.map((row, rowIndex) => (
+                  <div key={rowIndex} className="manager-theater-right-screen-row">
+                    <div className='manager-theater-right-screen-row-number'>{row.seat_row}</div>
+                    <div className="manager-theater-right-screen-row-seats">
+                      {row.seats.map((seat, seatIndex) => (
+                        <div
+                          key={seatIndex}
+                          className={`manager-theater-right-screen-col ${seat.reserved === 'true' ? 'reserved' : ''} ${seat.selected === 'true' ? 'selected' : ''}`}
+                        >
+                          {seat.seat_col}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  </div>
+                )))}
+            </div>
           </div>
         </div>
       </div>

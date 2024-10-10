@@ -81,5 +81,87 @@
   height: 140px;
   resize: none; 
   overflow-y: auto;
-  
+}
+
+.manager-theater-right-screen {
+  margin: 20px auto;
+  text-align: center;
+}
+.manager-theater-right-screen-seat-wrap {
+  width: 100%;
+}
+
+.manager-theater-right-screen-row {
+  display: flex;
+  justify-content: center;
+  margin: 2px 0px;
+  width: 100%;
+}
+
+.manager-theater-right-screen-row-number {
+  margin-right: 10px;
+  width: 21px;
+  height: 16px;
+  line-height: 16px;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  color: white
+}
+
+.manager-theater-right-screen-row-seats {
+  display: flex;
+}
+
+.manager-theater-right-screen-col {
+  width: 21px;
+  height: 16px;
+  line-height: 18px;
+  font-size: 10px;
+  margin: 0 2px;
+  background-color: #aaa;
+  color: white;
+  border-radius: 7px 7px 2px 0px;
+  cursor: pointer;
+  text-align: center; 
+  white-space: nowrap; 
+  /* overflow: hidden;  */
+}
+
+.handicap {
+  width: 21px;
+  height: 16px;
+  margin: 0 2px;
+  font-size: 10px;
+  background-color: rgb(93, 187, 84);
+  color: white;
+  border-radius: 7px 7px 2px 0px;
+}
+.aisle {
+  width: 10px;
+  height: 16px;
+  margin: 0 2px;
+  background-color: black;
+  color: black;
+}
+.blank {
+  width: 21px;
+  height: 16px;
+  margin: 0 2px;
+  background-color: black;
+  color: black;
+}
+.no-select {
+  background-color: #03778b;
+  /* background: #e8e8e8 url('seat_no_select.png') no-repeat center center; */
+  background-size: 28px 21px;
+  opacity: 0.5;
+  font-size: 0px;
+  cursor: not-allowed;
+}
+.reserved {
+  background-color: #f44336;
+  border: 1px solid #f44336;
+  color: white;
+  cursor: pointer;
 }

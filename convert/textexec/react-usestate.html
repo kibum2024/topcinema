@@ -30,7 +30,7 @@
                 initHandlerCode += `  set${capitalizedStateName}("");\n`;
 
                 // setFindEntity 코드
-                setFindEntityCode += `    set${capitalizedStateName}(find${capitalize(tableName.slice(0, -1))}.${convertToCamelCase(field.name)});\n`;
+                setFindEntityCode += `    set${capitalizedStateName}(find${capitalize(tableName.slice(0, -1))}.${field.name});\n`;
 
                 // 객체 매핑 코드
                 objectMappingCode += `  ${field.name}: ${stateName},\n`;
@@ -86,10 +86,6 @@
 
         function toCamelCase(str) {
             return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-        }
-
-        function convertToCamelCase(fieldName) {
-            return fieldName.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
         }
 
         function capitalize(str) {
